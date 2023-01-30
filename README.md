@@ -8,8 +8,9 @@ I use C++ native data types, int and float. I plan to implement the following fu
 
 
 - [x] zeros, ones, bool, random, null/empty, is_null, Eye
-- [ ] Vector Multiplication, Dot Product, Cross Product
 - [ ] Reshape, Concatenate, Squeeze, Unsqueez, Transpose, Permutate
+- [ ] Vector Multiplication, Dot Product, Cross Product
+- [ ] Matrix Multiplication, Dot Product, Cross Product
 - [ ] Linear Layer, Multi-Layer, 
 - [ ] BatchNorm2D, Sigmoid, ReLU
 - [ ] Convolution2D
