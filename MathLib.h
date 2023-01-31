@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 
 #ifndef MATHLIB_H
@@ -13,6 +14,11 @@ namespace MathLib {
       Mat(T& matrix, std::vector<int>& matShape) {
         if (matShape.size() != 4) {
           throw std::invalid_argument("Must specify the matrix's shape with four dimensions");
+        };
+        for (int i = 0; i < 4; i++) {
+          if (matShape[i] < 1) {
+            throw std::invalid_argument("All dimensional axis must be above 1, such as {1, 1, 2, 2}");
+          };
         };
         data = matrix;
         dims = matShape;
@@ -42,6 +48,7 @@ namespace MathLib {
       };
 
       void print() {};
+
       ~Mat() {};
   };
 
@@ -119,48 +126,174 @@ namespace MathLib {
   };
 
 
-  template <typename T> Mat<std::vector<T>> concat(std::vector<T>& matrix1, std::vector<T>& matrix2, int& dim) {
+  template <typename T> Mat<std::vector<T>> slice(Mat<std::vector<T>>& matrix, std::vector<std::vector<int>> slice_idx) {
     
-    return matrix1;
+    Mat<std::vector<T>> mat(matrix, shape);
+    return mat;
+  };
+
+  std::vector<float> slice(std::vector<float> vector, int start, int end) {
+    std::vector<float> subvec;
+    return subvec;
   };
 
 
-  template <typename T> std::vector<T> transpose(std::vector<T>& matrix, std::vector<int>& curShape, int& idxA, int& idxB) { 
+  template <typename T> Mat<std::vector<T>> concat(Mat<std::vector<T>>& matrix1, std::vector<T>& matrix2, int& dim) {
+  
+    Mat<std::vector<T>> mat(matrix1, shape);
+    return mat;
+  };
+
+
+  template <typename T> Mat<std::vector<T>> transpose(Mat<std::vector<T>>& matrix, int idxA, int idxB) { 
+    
+    
     if (curShape[idxA] == 1 || curShape[idxB] == 1) {
       return matrix;
     }
     else {
-      // for (int b = 0; b < curShape[0]; b++) {
-      //   for (int c = 0; c < curShape[1]; c++) {
-      //     for (int r = 0; r < curShape[2]; r++) {
-      //       for (int l = 0; l < curShape[3]; l++) {
-
-      //       }
-      //     }
-      //   }
-      // }
-      return matrix;
+      
+      Mat<std::vector<T>> mat(matrix, shape);
+      return mat;
     }
   };
 
-  template <typename T> std::vector<T> slice(T* matrix, std::vector<std::vector<int>> slice_idx) {
 
+  template <typename T> Mat<std::vector<T>> permute(Mat<std::vector<T>>& matrix, int& idxA, int& idxB) {
+    
+    Mat<std::vector<T>> mat(matrix, shape);
+    return mat;
   };
+
+
+  Mat<std::vector<float>> mat_add(Mat<std::vector<float>>& mat1, Mat<std::vector<float>>& mat2) {
+    std::vector<int> m1Shape = mat1.shape();
+    std::vector<int> m2Shape = mat2.shape();
+
+    int range = 1;
+    for (int i = 0; i < 4; i++) {
+      if (m1Shape[i] < m2Shape[i]) {
+        throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+      };
+      if (m1Shape[i] != m2Shape[i] && m2Shape[i] != 1) {
+        throw std::invalid_argument("The value of Matrix 2's axis must be either 1 or the same to the Matrix 1's");
+      };
+      if (m1Shape[1] != m2Shape[1]) {
+        int multi = m1Shape[1] / m2Shape[1];
+        range *= multi;
+      };
+    };
+    
+    int mat1Length = 1;
+    for (int dim : m1Shape) { mat1Length *= dim; };
+
+    std::vector<float> data1 = mat1.data;
+    std::vector<float> data2 = mat2.data;
+    std::vector<float> newVector;
+    newVector.reserve(mat1Length);
+
+    int mat2Length = 1;
+    for (int dim : m2Shape) { mat2Length *= dim; };
+
+    for (int l = 0; l < mat2Length; l++) {
+      for (int r = 0; r < range; r++) {
+        int idx = l + r * mat2Length;
+        newVector[idx] = data1[idx] + data2[l];
+      }; 
+    };
+
+    Mat<std::vector<float>> mat(data1, mat1.shape());
+    return mat;
+  };
+
+
+  Mat<std::vector<float>> mat_mul(Mat<std::vector<float>>& mat1, Mat<std::vector<float>>& mat2) {
+    std::vector<int> m1Shape = mat1.shape();
+    std::vector<int> m2Shape = mat2.shape();
+
+    int range = 1;
+    for (int i = 0; i < 4; i++) {
+      if (m1Shape[i] < m2Shape[i]) {
+        throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+      };
+      if (m1Shape[i] != m2Shape[i] && m2Shape[i] != 1) {
+        throw std::invalid_argument("The value of Matrix 2's axis must be either 1 or the same to the Matrix 1's");
+      };
+      if (m1Shape[1] != m2Shape[1]) {
+        int multi = m1Shape[1] / m2Shape[1];
+        range *= multi;
+      };
+    };
+    
+    int mat1Length = 1;
+    for (int dim : m1Shape) { mat1Length *= dim; };
+
+    std::vector<float> data1 = mat1.data;
+    std::vector<float> data2 = mat2.data;
+    std::vector<float> newVector;
+    newVector.reserve(mat1Length);
+
+    int mat2Length = 1;
+    for (int dim : m2Shape) { mat2Length *= dim; };
+
+    for (int l = 0; l < mat2Length; l++) {
+      for (int r = 0; r < range; r++) {
+        int idx = l + r * mat2Length;
+        newVector[idx] = data1[idx] * data2[l];
+      }; 
+    };
+
+    Mat<std::vector<float>> mat(data1, mat1.shape());
+    return mat;
+  };
+
+
+  Mat<std::vector<float>> mat_dot(Mat<std::vector<float>>& mat1, Mat<std::vector<float>>& mat2) {
+    std::vector<int> m1Shape = mat1.shape();
+    std::vector<int> m2Shape = mat2.shape();
+
+    if (m2Shape[2] != m1Shape[3] || m2Shape[0] != 1 || m2Shape[1] != 1) {
+      throw std::invalid_argument("Dimensions are incompatible for dot product.");
+    };
+    std::vector<int> newShape = {m1Shape[0], m1Shape[1], m1Shape[2], m2Shape[3]};
+    
+    int range = (m1Shape[0] / m2Shape[0]) * (m1Shape[1] / m2Shape[1]);
+    
+    int mat1Length = 1;
+    for (int dim : m1Shape) { mat1Length *= dim; };
+    int newLength = 1;
+    for (int dim : newShape) { newLength *= dim; };
+    int mat2Length = 1;
+    for (int dim : m2Shape) { mat2Length *= dim; };
+
+    std::vector<float> data1 = mat1.data;
+    Mat<std::vector<float>> transData2 = transpose<float>(mat2, 2, 3);
+    std::vector<float> data2 = transData2.data;
+
+    std::vector<float> newVector;
+    newVector.reserve(newLength);
+
+    for (int i = 0; i < mat1Length / m1Shape[3]; i++) {
+      for (int j = 0; j < mat2Length / m2Shape[2]; j++) {
+        float subsum = 0;
+        for (int k = 0; k < m1Shape[3]; k++) {
+          int idx1 = k + i * m1Shape[3];
+          int idx2 = k + j * m2Shape[2];
+          subsum += (data1[idx1] * data2[idx2]);
+        };
+        newVector[j + i * m1Shape[3]] = subsum;
+      }; 
+    };
+
+    Mat<std::vector<float>> newMat(newVector, newShape);
+    return newMat;
+  };
+
+  
+
 };
 
 #endif
-
-//   template <typename T> std::vector<T> concat();
-//   template <typename T> std::vector<T> transpose();
-//   template <typename T> std::vector<T> permute();
-
-//   template <typename T> std::vector<T> vec_mul(std::vector<T>, std::vector<T>);
-//   template <typename T> std::vector<T> vec_dot(std::vector<T>, std::vector<T>);
-//   template <typename T> std::vector<T> vec_cro(std::vector<T>, std::vector<T>);
-
-//   template <typename T> std::vector<T> mat_mul(std::vector<T>, std::vector<T>);
-//   template <typename T> std::vector<T> mat_dot(std::vector<T>, std::vector<T>);
-//   template <typename T> std::vector<T> mat_cro(std::vector<T>, std::vector<T>);
 
 //   template <typename T> std::vector<T> Linear();
 //   template <typename T> std::vector<T> MLinear();
