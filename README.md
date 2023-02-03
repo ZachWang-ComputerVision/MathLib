@@ -1,22 +1,18 @@
-# MathLib
+# NNLib
 
-This project includes basic math and deep learning functions with C++. User can choose either run on CPU or GPU (CUDA). If the program is ran on CPU, some functions may utilize multi-thread to calculate the result.
+This project is programmed solely with C++. The objective is to build basic matrix operations for deep learning functions. User can choose either run on CPU or GPU (CUDA). If the program is ran on CPU, some functions may utilize multi-thread to calculate the result. My focus is in Computer Vision, so functions that are implemented in this project are the ones I use regularly, but I have plans to continuously develop it.
 
-My focus is in Computer Vision, so functions that are implemented in this project are the ones I use regularly. The purpose of creating this project is to get myself familiar with C++ and CUDA programming.
-
-I use C++ native data types, int and float. I plan to implement the following functions:
-
+I use C++ native data types, int and double. Here are the functions:
 
 - [x] Zeros, Ones, Bool, Random, Eye
-- [x] Slice
-- [x] Reshape, Concatenate, Transpose, Permutate
-- [x] Vector Addition, Multiplication, Dot Product
-- [x] Matrix Addition, Multiplication, Dot Product
-- [ ] Linear Layer, Multi-Layer Perceptron
-- [ ] BatchNorm2D, LayerNorm
-- [ ] Sigmoid, ReLU
-- [ ] Convolution2D
-- [ ] SGD, Adam
+- [x] Slice, Reshape, Concatenate, Transpose, Permutate
+- [x] Matrix Addition, Subtraction, Multiplication, Division
+- [x] Matrix Dot Product
+- [x] Linear Layer, Multi-Layer Perceptron
+- [x] BatchNorm2D, LayerNorm
+- [x] Sigmoid, ReLU
+- [x] Convolution2D
+- [x] SGD, Adam
 - [x] Autograd
 - [ ] Load, Save Weights
 
