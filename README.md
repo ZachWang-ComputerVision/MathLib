@@ -7,7 +7,8 @@ My focus is in Computer Vision, so functions that are implemented in this projec
 I use C++ native data types, int and float. I plan to implement the following functions:
 
 
-- [x] zeros, ones, bool, random, Eye
+- [x] Zeros, Ones, Bool, Random, Eye
+- [x] Slice
 - [x] Reshape, Concatenate, Transpose, Permutate
 - [x] Vector Addition, Multiplication, Dot Product
 - [x] Matrix Addition, Multiplication, Dot Product
