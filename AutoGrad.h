@@ -2,7 +2,7 @@
 #include <vector>
 #include <list>
 
-#include "MathLib.h"
+#include "NNLib.h"
 
 
 class Tensor{

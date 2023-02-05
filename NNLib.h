@@ -2,10 +2,10 @@
 #include <vector>
 #include <cstdlib>
 
-#ifndef MATHLIB_H
-#define MATHLIB_H
+#ifndef NNLIB_H
+#define NNLIB_H
 
-namespace MathLib {
+namespace NNLib {
   
   template <class T> class Mat {
     private:
@@ -77,13 +77,13 @@ namespace MathLib {
   };
 
 
-  Mat<std::vector<float>> randomFloat(std::vector<int>& shape) {
+  template <typename T> Mat<std::vector<T>> randomDecimal(std::vector<int>& shape) {
     int size = 1;
     for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
-    std::vector<float> vec;
+    std::vector<T> vec;
     vec.reserve(size);
-    for (int i = 0; i < size; i++) { vec[i] = (int)(rand() % 100) / 100; };
-    Mat<std::vector<float>> mat(vec, shape);
+    for (int i = 0; i < size; i++) { vec[i] = (T)(rand() % 100) / 100.0; };
+    Mat<std::vector<T>> mat(vec, shape);
     return mat;
   };
 
@@ -120,67 +120,75 @@ namespace MathLib {
   };
 
 
-  template <typename T> Mat<std::vector<T>> slice(Mat<std::vector<T>>& mat, std::vector<int>& indices) {
-    
-    std::vector<T> data = mat.data;
-    std::vector<int> shape = mat.shape();
-    std::vector<int> newShape;
+  // template <typename T> Mat<std::vector<T>> slice(Mat<std::vector<T>>& mat, std::vector<int>& indices) {
+  //   std::vector<T> data = mat.data;
+  //   std::vector<int> shape = mat.shape();
+  //   std::vector<int> newShape;
 
-    // pos contains all the starting indices and keeps tracking if there is any dimension is 
-    std::vector<int> pos(shape.size(), 0);
-    int newSize = 1;
-    for (int i = 0; i < indices.size(); i++) {
-      if (indices[i].size() != 2) { throw std::invalid_argument("One of axis's slicing indices is in a wrong form"); };
-      int s = indices[i][0];
-      int e = indices[i][1];
-      if (e < s) { throw std::invalid_argument("Begining or end index is set wrong."); };
-      if (s < 0 || e > shape[i]) { throw std::invalid_argument("Index is out of range."); };
-      int dimVal = e - s + 1;
-      newSize *= dimVal;
-      newShape.push_back(dimVal);
-      pos[i] = indices[i][0]
-    };
+  //   // pos contains all the starting indices and keeps tracking if there is any dimension is 
 
-    std::vector<T> subVec;
-    subVec.reserve(newSize);
+  //   int newSize = 1;
+  //   for (int i = 0; i < indices.size(); i++) {
+  //     if (indices[i].size() != 2) { throw std::invalid_argument("One of axis's slicing indices is in a wrong form"); };
+  //     int s = indices[i][0];
+  //     int e = indices[i][1];
+  //     if (e < s) { throw std::invalid_argument("Begining or end index is set wrong."); };
+  //     if (s < 0 || e > shape[i]) { throw std::invalid_argument("Index is out of range."); };
+  //     int dimVal = e - s + 1;
+  //     newSize *= dimVal;
+  //     newShape.push_back(dimVal);
+  //   };
 
-    bool end = false;
-    int count = 0;
-    while (end != true) {
-      // Going through the list in backwards to calculate the index.
-      for (int i = pos.size(); i > -1; i--) {
+  //   std::vector<T> subVec;
+  //   subVec.reserve(newSize);
+
+  //   bool end = false;
+  //   int count = 0;
+  //   int chunk = newShape.back();
+  //   // int idx = pos.back();
+  //   while (end != true) {
+  //     // Going through the list in backwards to calculate the index.
+  //     for (int i = newShape.size() - 2; i > -1; i--) {
         
-        // Get position and push the items into the subVec
-        int chunk = shape.back();
-        int idx = pos.back();
-        for (int k = shape.size() - 2; k > -1; k--) {
-          idx += pos[k] * chunk;
-          newMat[count] = data[idx];
-          count++;
-          pos[i]++;
-        };
+  //       // Get position and push the items into the subVec
+  //       for (int k = shape.size() - 2; k > -1; k--) {
+  //         idx += pos[k] * chunk;
+  //         newMat[count] = data[idx];
+  //         count++;
+  //         pos[i]++;
+  //       };
 
-        // Check if the axis's end is reached or not. If it does, update the pos track
-        if (pos[i] == indices[i][1]) {
-          if (i > 0) {
-            pos[i - 1]++;
-            for (int k = i; k < pose.size(); k++) {
-              pos[i] = indices[i][0];
-            };
-          }
-          // All the axis are upda
-          else {
-            // check if all axis meet the end
-            for 
-            end = true;
-          }
-        };
-      };
-    };
+  //       // Check if the axis's end is reached or not. If it does, update the pos track
+  //       if (pos[i] == indices[i][1]) {
+  //         if (i > 0) {
+  //           pos[i - 1]++;
+            
+  //         }
+
+  //         for (int k = i; k < pose.size(); k++) {
+  //           pos[i] = indices[i][0];
+  //         };
+
+  //         // All the axis are upda
+  //         else {
+  //           // check if all axis meet the end
+  //           int count_req = 0;
+  //           for (int n = 1; n < pose.size(); n++) {
+  //             if (pos[n] == indices[i][1]) {
+  //               count_req++;
+  //             };
+  //           };
+  //           if ()
+  //           end = true;
+  //         }
+
+  //       };
+  //     };
+  //   };
     
-    Mat<std::vector<T>> subMat(subVec, newSize);
-    return subMat;
-  };
+  //   Mat<std::vector<T>> subMat(subVec, newSize);
+  //   return subMat;
+  // };
 
 
   template <typename T> Mat<std::vector<T>> concat(Mat<std::vector<T>>& matrix1, std::vector<T>& matrix2, int& dim) {
@@ -298,82 +306,222 @@ namespace MathLib {
   };
 
 
-  Mat<std::vector<float>> mat_add(Mat<std::vector<float>>& mat1, Mat<std::vector<float>>& mat2) {
+  template <typename T> Mat<std::vector<T>> mat_add(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
+    std::vector<int> newShape(m1Shape.size(), 1);
 
-    int range = 1;
-    for (int i = 0; i < 4; i++) {
-      if (m1Shape[i] < m2Shape[i]) {
-        throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
-      };
-      if (m1Shape[i] != m2Shape[i] && m2Shape[i] != 1) {
-        throw std::invalid_argument("The value of Matrix 2's axis must be either 1 or the same to the Matrix 1's");
-      };
-      
-      int multi = m1Shape[i] / m2Shape[i];
-      range *= multi;
+    if (m1Shape.size() != m2Shape.size()) { 
+      throw std::invalid_argument("The number of dimension is different between the two matrices."); 
     };
     
-    int mat1Length = 1;
-    for (int dim : m1Shape) { mat1Length *= dim; };
-
-    std::vector<float> data1 = mat1.data;
-    std::vector<float> data2 = mat2.data;
-    std::vector<float> newVector;
-    newVector.reserve(mat1Length);
-
-    int mat2Length = 1;
-    for (int dim : m2Shape) { mat2Length *= dim; };
-
-    for (int l = 0; l < mat2Length; l++) {
-      for (int r = 0; r < range; r++) {
-        int idx = l + r * mat2Length;
-        newVector[idx] = data1[idx] + data2[l];
-      }; 
+    int size1 = 1;
+    int size2 = 1;
+    int newSize = 1;
+    for (int i = 0; i < m1Shape.size(); i++) {
+      if (m1Shape[i] != m2Shape[i]) {
+        if (m1Shape[i] != 1 || m2Shape[i] != 1) {
+          throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+        };
+      };
+      
+      size1 *= m1Shape[i];
+      size2 *= m2Shape[i];
+      int n = std::max(m1Shape[i], m2Shape[i]);
+      newShape[i] = n;
+      newSize *= n;
     };
 
-    Mat<std::vector<float>> mat(newVector, mat1.shape());
+    std::vector<T> data1 = mat1.data;
+    std::vector<T> data2 = mat2.data;
+    std::vector<T> newVector;
+    newVector.reserve(newSize);
+
+    int chunk1 = m1Shape[m1Shape.size() - 1] * m1Shape[m1Shape.size() - 2];
+    int chunk2 = m2Shape[m2Shape.size() - 1] * m2Shape[m2Shape.size() - 2];
+    int round1 = size1 / chunk1;
+    int round2 = size2 / chunk2;
+
+    int count = 0;
+    for (int i = 0; i < round1; i ++) {
+      for (int j = 0; j < round2; j++) {
+        for (int ii = 0; ii < chunk1; ii++) {
+          for (int jj = 0; jj < chunk2; jj++) {
+            int idx1 = i * chunk1 + ii;
+            int idx2 = j * chunk2 + jj;
+            newVector[count] = data1[idx1] + data1[idx2];
+            count++;
+          };
+        };
+      };
+    };
+
+    Mat<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
 
 
-  Mat<std::vector<float>> mat_mul(Mat<std::vector<float>>& mat1, Mat<std::vector<float>>& mat2) {
+  template <typename T> Mat<std::vector<T>> mat_sub(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
+    std::vector<int> newShape(m1Shape.size(), 1);
 
-    int range = 1;
-    for (int i = 0; i < 4; i++) {
-      if (m1Shape[i] < m2Shape[i]) {
-        throw std::invalid_argument("One of the axis from Matrix 1 has a smaller value than the same axis from Matrix 2");
-      };
-      if (m1Shape[i] != m2Shape[i] && m2Shape[i] != 1) {
-        throw std::invalid_argument("The value of Matrix 2's axis must be either 1 or the same to the Matrix 1's");
-      };
-
-      int multi = m1Shape[i] / m2Shape[i];
-      range *= multi;
+    if (m1Shape.size() != m2Shape.size()) { 
+      throw std::invalid_argument("The number of dimension is different between the two matrices."); 
     };
     
-    int mat1Length = 1;
-    for (int dim : m1Shape) { mat1Length *= dim; };
-
-    std::vector<float> data1 = mat1.data;
-    std::vector<float> data2 = mat2.data;
-    std::vector<float> newVector;
-    newVector.reserve(mat1Length);
-
-    int mat2Length = 1;
-    for (int dim : m2Shape) { mat2Length *= dim; };
-
-    for (int l = 0; l < mat2Length; l++) {
-      for (int r = 0; r < range; r++) {
-        int idx = l + r * mat2Length;
-        newVector[idx] = data1[idx] * data2[l];
-      }; 
+    int size1 = 1;
+    int size2 = 1;
+    int newSize = 1;
+    for (int i = 0; i < m1Shape.size(); i++) {
+      if (m1Shape[i] != m2Shape[i]) {
+        if (m1Shape[i] != 1 || m2Shape[i] != 1) {
+          throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+        };
+      };
+      
+      size1 *= m1Shape[i];
+      size2 *= m2Shape[i];
+      int n = std::max(m1Shape[i], m2Shape[i]);
+      newShape[i] = n;
+      newSize *= n;
     };
 
-    Mat<std::vector<float>> mat(newVector, mat1.shape());
+    std::vector<T> data1 = mat1.data;
+    std::vector<T> data2 = mat2.data;
+    std::vector<T> newVector;
+    newVector.reserve(newSize);
+
+    int chunk1 = m1Shape[m1Shape.size() - 1] * m1Shape[m1Shape.size() - 2];
+    int chunk2 = m2Shape[m2Shape.size() - 1] * m2Shape[m2Shape.size() - 2];
+    int round1 = size1 / chunk1;
+    int round2 = size2 / chunk2;
+
+    int count = 0;
+    for (int i = 0; i < round1; i ++) {
+      for (int j = 0; j < round2; j++) {
+        for (int ii = 0; ii < chunk1; ii++) {
+          for (int jj = 0; jj < chunk2; jj++) {
+            int idx1 = i * chunk1 + ii;
+            int idx2 = j * chunk2 + jj;
+            newVector[count] = data1[idx1] - data1[idx2];
+            count++;
+          };
+        };
+      };
+    };
+
+    Mat<std::vector<T>> mat(newVector, newShape);
+    return mat;
+  };
+
+
+  template <typename T> Mat<std::vector<T>> mat_mul(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
+    std::vector<int> m1Shape = mat1.shape();
+    std::vector<int> m2Shape = mat2.shape();
+    std::vector<int> newShape(m1Shape.size(), 1);
+
+    if (m1Shape.size() != m2Shape.size()) { 
+      throw std::invalid_argument("The number of dimension is different between the two matrices."); 
+    };
+    
+    int size1 = 1;
+    int size2 = 1;
+    int newSize = 1;
+    for (int i = 0; i < m1Shape.size(); i++) {
+      if (m1Shape[i] != m2Shape[i]) {
+        if (m1Shape[i] != 1 || m2Shape[i] != 1) {
+          throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+        };
+      };
+      
+      size1 *= m1Shape[i];
+      size2 *= m2Shape[i];
+      int n = std::max(m1Shape[i], m2Shape[i]);
+      newShape[i] = n;
+      newSize *= n;
+    };
+
+    std::vector<T> data1 = mat1.data;
+    std::vector<T> data2 = mat2.data;
+    std::vector<T> newVector;
+    newVector.reserve(newSize);
+
+    int chunk1 = m1Shape[m1Shape.size() - 1] * m1Shape[m1Shape.size() - 2];
+    int chunk2 = m2Shape[m2Shape.size() - 1] * m2Shape[m2Shape.size() - 2];
+    int round1 = size1 / chunk1;
+    int round2 = size2 / chunk2;
+
+    int count = 0;
+    for (int i = 0; i < round1; i ++) {
+      for (int j = 0; j < round2; j++) {
+        for (int ii = 0; ii < chunk1; ii++) {
+          for (int jj = 0; jj < chunk2; jj++) {
+            int idx1 = i * chunk1 + ii;
+            int idx2 = j * chunk2 + jj;
+            newVector[count] = data1[idx1] * data1[idx2];
+            count++;
+          };
+        };
+      };
+    };
+
+    Mat<std::vector<T>> mat(newVector, newShape);
+    return mat;
+  };
+
+
+  template <typename T> Mat<std::vector<T>> mat_div(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
+    std::vector<int> m1Shape = mat1.shape();
+    std::vector<int> m2Shape = mat2.shape();
+    std::vector<int> newShape(m1Shape.size(), 1);
+
+    if (m1Shape.size() != m2Shape.size()) { 
+      throw std::invalid_argument("The number of dimension is different between the two matrices."); 
+    };
+    
+    int size1 = 1;
+    int size2 = 1;
+    int newSize = 1;
+    for (int i = 0; i < m1Shape.size(); i++) {
+      if (m1Shape[i] != m2Shape[i]) {
+        if (m1Shape[i] != 1 || m2Shape[i] != 1) {
+          throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+        };
+      };
+      
+      size1 *= m1Shape[i];
+      size2 *= m2Shape[i];
+      int n = std::max(m1Shape[i], m2Shape[i]);
+      newShape[i] = n;
+      newSize *= n;
+    };
+
+    std::vector<T> data1 = mat1.data;
+    std::vector<T> data2 = mat2.data;
+    std::vector<T> newVector;
+    newVector.reserve(newSize);
+
+    int chunk1 = m1Shape[m1Shape.size() - 1] * m1Shape[m1Shape.size() - 2];
+    int chunk2 = m2Shape[m2Shape.size() - 1] * m2Shape[m2Shape.size() - 2];
+    int round1 = size1 / chunk1;
+    int round2 = size2 / chunk2;
+
+    int count = 0;
+    for (int i = 0; i < round1; i ++) {
+      for (int j = 0; j < round2; j++) {
+        for (int ii = 0; ii < chunk1; ii++) {
+          for (int jj = 0; jj < chunk2; jj++) {
+            int idx1 = i * chunk1 + ii;
+            int idx2 = j * chunk2 + jj;
+            newVector[count] = data1[idx1] / data1[idx2];
+            count++;
+          };
+        };
+      };
+    };
+
+    Mat<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
 
