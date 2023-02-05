@@ -300,7 +300,7 @@ namespace NNLib {
 
 
   template <typename T> Mat<std::vector<T>> permute(Mat<std::vector<T>>& matrix, int& idxA, int& idxB) {
-    
+    std::vector<int> shape = matrix.shape();
     Mat<std::vector<T>> mat(matrix, shape);
     return mat;
   };
@@ -314,19 +314,18 @@ namespace NNLib {
     if (m1Shape.size() != m2Shape.size()) { 
       throw std::invalid_argument("The number of dimension is different between the two matrices."); 
     };
+    if (m1Shape.size() < 1) {
+      throw std::invalid_argument("The matrix cannot be empty."); 
+    };
     
-    int size1 = 1;
-    int size2 = 1;
     int newSize = 1;
     for (int i = 0; i < m1Shape.size(); i++) {
       if (m1Shape[i] != m2Shape[i]) {
-        if (m1Shape[i] != 1 || m2Shape[i] != 1) {
-          throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+        if (m1Shape[i] != 1 && m2Shape[i] != 1) {
+          throw std::invalid_argument("The dimensions are incompatible.");
         };
       };
-      
-      size1 *= m1Shape[i];
-      size2 *= m2Shape[i];
+
       int n = std::max(m1Shape[i], m2Shape[i]);
       newShape[i] = n;
       newSize *= n;
@@ -337,25 +336,55 @@ namespace NNLib {
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-    int chunk1 = m1Shape[m1Shape.size() - 1] * m1Shape[m1Shape.size() - 2];
-    int chunk2 = m2Shape[m2Shape.size() - 1] * m2Shape[m2Shape.size() - 2];
-    int round1 = size1 / chunk1;
-    int round2 = size2 / chunk2;
 
-    int count = 0;
-    for (int i = 0; i < round1; i ++) {
-      for (int j = 0; j < round2; j++) {
-        for (int ii = 0; ii < chunk1; ii++) {
-          for (int jj = 0; jj < chunk2; jj++) {
-            int idx1 = i * chunk1 + ii;
-            int idx2 = j * chunk2 + jj;
-            newVector[count] = data1[idx1] + data1[idx2];
-            count++;
+    void recur(std::vector<T>& newVector, Mat<std::vector<T>>& m1, Mat<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
+      std::vector<int> shape1 = m1.shape();
+      std::vector<int> shape2 = m2.shape();
+
+      if (dimPrt == shape1.size() - 1) {
+        if (shape1[dimPrt] == shape2[dimPrt]) {
+          for (i = 0; i < e1 - s1 + 1; i ++) {
+            newVector[idx] = m1.data[i + s1] + m2.data[i + s2];
+            idx ++;
+          };
+        };
+        else {
+          for (int i = s1; i < e1; i ++) {
+            for (int j = s2; j < e2; j ++) {
+              newVector[idx] = m1.data[i] + m2.data[j];
+              idx ++;
+            };
+          };
+        };
+      }
+      else {
+        int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
+        int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
+        int nextDimPrt = dimPrt + 1;
+        if (shape1[dimPrt] == shape2[dimPrt]) {
+          for (int i = 0; i < shape1[dimPrt]; i ++) {
+            int newS1 = s1 + i * chunk1;
+            int newE1 = e1 + i * chunk1;
+            int newS2 = s2 + i * chunk2;
+            int newE2 = e2 + i * chunk2;
+            recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+          };
+        }
+        else {
+          for (int i = 0; i < shape1[dimPrt], i ++) {
+            int newS1 = s1 + i * chunk1;
+            int newE1 = e1 + i * chunk1;
+            for (int j = 0; j < shape2[dimPrt], j ++) {
+              int newS2 = s2 + i * chunk2;
+              int newE2 = e2 + i * chunk2;
+              recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+            };
           };
         };
       };
     };
 
+    recur(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2)
     Mat<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
@@ -369,19 +398,18 @@ namespace NNLib {
     if (m1Shape.size() != m2Shape.size()) { 
       throw std::invalid_argument("The number of dimension is different between the two matrices."); 
     };
+    if (m1Shape.size() < 1) {
+      throw std::invalid_argument("The matrix cannot be empty."); 
+    };
     
-    int size1 = 1;
-    int size2 = 1;
     int newSize = 1;
     for (int i = 0; i < m1Shape.size(); i++) {
       if (m1Shape[i] != m2Shape[i]) {
-        if (m1Shape[i] != 1 || m2Shape[i] != 1) {
-          throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+        if (m1Shape[i] != 1 && m2Shape[i] != 1) {
+          throw std::invalid_argument("The dimensions are incompatible.");
         };
       };
-      
-      size1 *= m1Shape[i];
-      size2 *= m2Shape[i];
+
       int n = std::max(m1Shape[i], m2Shape[i]);
       newShape[i] = n;
       newSize *= n;
@@ -392,25 +420,55 @@ namespace NNLib {
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-    int chunk1 = m1Shape[m1Shape.size() - 1] * m1Shape[m1Shape.size() - 2];
-    int chunk2 = m2Shape[m2Shape.size() - 1] * m2Shape[m2Shape.size() - 2];
-    int round1 = size1 / chunk1;
-    int round2 = size2 / chunk2;
 
-    int count = 0;
-    for (int i = 0; i < round1; i ++) {
-      for (int j = 0; j < round2; j++) {
-        for (int ii = 0; ii < chunk1; ii++) {
-          for (int jj = 0; jj < chunk2; jj++) {
-            int idx1 = i * chunk1 + ii;
-            int idx2 = j * chunk2 + jj;
-            newVector[count] = data1[idx1] - data1[idx2];
-            count++;
+    void recur(std::vector<T>& newVector, Mat<std::vector<T>>& m1, Mat<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
+      std::vector<int> shape1 = m1.shape();
+      std::vector<int> shape2 = m2.shape();
+
+      if (dimPrt == shape1.size() - 1) {
+        if (shape1[dimPrt] == shape2[dimPrt]) {
+          for (i = 0; i < e1 - s1 + 1; i ++) {
+            newVector[idx] = m1.data[i + s1] - m2.data[i + s2];
+            idx ++;
+          };
+        };
+        else {
+          for (int i = s1; i < e1; i ++) {
+            for (int j = s2; j < e2; j ++) {
+              newVector[idx] = m1.data[i] - m2.data[j];
+              idx ++;
+            };
+          };
+        };
+      }
+      else {
+        int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
+        int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
+        int nextDimPrt = dimPrt + 1;
+        if (shape1[dimPrt] == shape2[dimPrt]) {
+          for (int i = 0; i < shape1[dimPrt]; i ++) {
+            int newS1 = s1 + i * chunk1;
+            int newE1 = e1 + i * chunk1;
+            int newS2 = s2 + i * chunk2;
+            int newE2 = e2 + i * chunk2;
+            recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+          };
+        }
+        else {
+          for (int i = 0; i < shape1[dimPrt], i ++) {
+            int newS1 = s1 + i * chunk1;
+            int newE1 = e1 + i * chunk1;
+            for (int j = 0; j < shape2[dimPrt], j ++) {
+              int newS2 = s2 + i * chunk2;
+              int newE2 = e2 + i * chunk2;
+              recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+            };
           };
         };
       };
     };
 
+    recur(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2)
     Mat<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
@@ -424,19 +482,18 @@ namespace NNLib {
     if (m1Shape.size() != m2Shape.size()) { 
       throw std::invalid_argument("The number of dimension is different between the two matrices."); 
     };
+    if (m1Shape.size() < 1) {
+      throw std::invalid_argument("The matrix cannot be empty."); 
+    };
     
-    int size1 = 1;
-    int size2 = 1;
     int newSize = 1;
     for (int i = 0; i < m1Shape.size(); i++) {
       if (m1Shape[i] != m2Shape[i]) {
-        if (m1Shape[i] != 1 || m2Shape[i] != 1) {
-          throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+        if (m1Shape[i] != 1 && m2Shape[i] != 1) {
+          throw std::invalid_argument("The dimensions are incompatible.");
         };
       };
-      
-      size1 *= m1Shape[i];
-      size2 *= m2Shape[i];
+
       int n = std::max(m1Shape[i], m2Shape[i]);
       newShape[i] = n;
       newSize *= n;
@@ -447,25 +504,55 @@ namespace NNLib {
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-    int chunk1 = m1Shape[m1Shape.size() - 1] * m1Shape[m1Shape.size() - 2];
-    int chunk2 = m2Shape[m2Shape.size() - 1] * m2Shape[m2Shape.size() - 2];
-    int round1 = size1 / chunk1;
-    int round2 = size2 / chunk2;
 
-    int count = 0;
-    for (int i = 0; i < round1; i ++) {
-      for (int j = 0; j < round2; j++) {
-        for (int ii = 0; ii < chunk1; ii++) {
-          for (int jj = 0; jj < chunk2; jj++) {
-            int idx1 = i * chunk1 + ii;
-            int idx2 = j * chunk2 + jj;
-            newVector[count] = data1[idx1] * data1[idx2];
-            count++;
+    void recur(std::vector<T>& newVector, Mat<std::vector<T>>& m1, Mat<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
+      std::vector<int> shape1 = m1.shape();
+      std::vector<int> shape2 = m2.shape();
+
+      if (dimPrt == shape1.size() - 1) {
+        if (shape1[dimPrt] == shape2[dimPrt]) {
+          for (i = 0; i < e1 - s1 + 1; i ++) {
+            newVector[idx] = m1.data[i + s1] * m2.data[i + s2];
+            idx ++;
+          };
+        };
+        else {
+          for (int i = s1; i < e1; i ++) {
+            for (int j = s2; j < e2; j ++) {
+              newVector[idx] = m1.data[i] * m2.data[j];
+              idx ++;
+            };
+          };
+        };
+      }
+      else {
+        int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
+        int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
+        int nextDimPrt = dimPrt + 1;
+        if (shape1[dimPrt] == shape2[dimPrt]) {
+          for (int i = 0; i < shape1[dimPrt]; i ++) {
+            int newS1 = s1 + i * chunk1;
+            int newE1 = e1 + i * chunk1;
+            int newS2 = s2 + i * chunk2;
+            int newE2 = e2 + i * chunk2;
+            recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+          };
+        }
+        else {
+          for (int i = 0; i < shape1[dimPrt], i ++) {
+            int newS1 = s1 + i * chunk1;
+            int newE1 = e1 + i * chunk1;
+            for (int j = 0; j < shape2[dimPrt], j ++) {
+              int newS2 = s2 + i * chunk2;
+              int newE2 = e2 + i * chunk2;
+              recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+            };
           };
         };
       };
     };
 
+    recur(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2)
     Mat<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
@@ -479,19 +566,18 @@ namespace NNLib {
     if (m1Shape.size() != m2Shape.size()) { 
       throw std::invalid_argument("The number of dimension is different between the two matrices."); 
     };
+    if (m1Shape.size() < 1) {
+      throw std::invalid_argument("The matrix cannot be empty."); 
+    };
     
-    int size1 = 1;
-    int size2 = 1;
     int newSize = 1;
     for (int i = 0; i < m1Shape.size(); i++) {
       if (m1Shape[i] != m2Shape[i]) {
-        if (m1Shape[i] != 1 || m2Shape[i] != 1) {
-          throw std::invalid_argument("One of the axis of Matrix 1 has a smaller value than the axis of Matrix 2");
+        if (m1Shape[i] != 1 && m2Shape[i] != 1) {
+          throw std::invalid_argument("The dimensions are incompatible.");
         };
       };
-      
-      size1 *= m1Shape[i];
-      size2 *= m2Shape[i];
+
       int n = std::max(m1Shape[i], m2Shape[i]);
       newShape[i] = n;
       newSize *= n;
@@ -502,75 +588,70 @@ namespace NNLib {
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-    int chunk1 = m1Shape[m1Shape.size() - 1] * m1Shape[m1Shape.size() - 2];
-    int chunk2 = m2Shape[m2Shape.size() - 1] * m2Shape[m2Shape.size() - 2];
-    int round1 = size1 / chunk1;
-    int round2 = size2 / chunk2;
 
-    int count = 0;
-    for (int i = 0; i < round1; i ++) {
-      for (int j = 0; j < round2; j++) {
-        for (int ii = 0; ii < chunk1; ii++) {
-          for (int jj = 0; jj < chunk2; jj++) {
-            int idx1 = i * chunk1 + ii;
-            int idx2 = j * chunk2 + jj;
-            newVector[count] = data1[idx1] / data1[idx2];
-            count++;
+    void recur(std::vector<T>& newVector, Mat<std::vector<T>>& m1, Mat<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
+      std::vector<int> shape1 = m1.shape();
+      std::vector<int> shape2 = m2.shape();
+
+      if (dimPrt == shape1.size() - 1) {
+        if (shape1[dimPrt] == shape2[dimPrt]) {
+          for (i = 0; i < e1 - s1 + 1; i ++) {
+            newVector[idx] = m1.data[i + s1] / m2.data[i + s2];
+            idx ++;
+          };
+        };
+        else {
+          for (int i = s1; i < e1; i ++) {
+            for (int j = s2; j < e2; j ++) {
+              newVector[idx] = m1.data[i] / m2.data[j];
+              idx ++;
+            };
+          };
+        };
+      }
+      else {
+        int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
+        int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
+        int nextDimPrt = dimPrt + 1;
+        if (shape1[dimPrt] == shape2[dimPrt]) {
+          for (int i = 0; i < shape1[dimPrt]; i ++) {
+            int newS1 = s1 + i * chunk1;
+            int newE1 = e1 + i * chunk1;
+            int newS2 = s2 + i * chunk2;
+            int newE2 = e2 + i * chunk2;
+            recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+          };
+        }
+        else {
+          for (int i = 0; i < shape1[dimPrt], i ++) {
+            int newS1 = s1 + i * chunk1;
+            int newE1 = e1 + i * chunk1;
+            for (int j = 0; j < shape2[dimPrt], j ++) {
+              int newS2 = s2 + i * chunk2;
+              int newE2 = e2 + i * chunk2;
+              recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+            };
           };
         };
       };
     };
 
+    recur(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2)
     Mat<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
 
 
-  Mat<std::vector<float>> mat_dot(Mat<std::vector<float>>& mat1, Mat<std::vector<float>>& mat2) {
-    std::vector<int> m1Shape = mat1.shape();
-    std::vector<int> m2Shape = mat2.shape();
-
-    if (m2Shape[2] != m1Shape[3] || m2Shape[0] != 1 || m2Shape[1] != 1) {
-      throw std::invalid_argument("Dimensions are incompatible for dot product.");
-    };
-    std::vector<int> newShape = {m1Shape[0], m1Shape[1], m1Shape[2], m2Shape[3]};
+  template <typename T> Mat<std::vector<T>> mat_dot(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
     
-    int range = (m1Shape[0] / m2Shape[0]) * (m1Shape[1] / m2Shape[1]);
-    
-    int mat1Length = 1;
-    for (int dim : m1Shape) { mat1Length *= dim; };
-    int newLength = 1;
-    for (int dim : newShape) { newLength *= dim; };
-    int mat2Length = 1;
-    for (int dim : m2Shape) { mat2Length *= dim; };
-
-    std::vector<float> data1 = mat1.data;
-    Mat<std::vector<float>> transData2 = transpose<float>(mat2, 2, 3);
-    std::vector<float> data2 = transData2.data;
-
-    std::vector<float> newVector;
-    newVector.reserve(newLength);
-
-    for (int i = 0; i < mat1Length / m1Shape[3]; i++) {
-      for (int j = 0; j < mat2Length / m2Shape[2]; j++) {
-        float subsum = 0;
-        for (int k = 0; k < m1Shape[3]; k++) {
-          int idx1 = k + i * m1Shape[3];
-          int idx2 = k + j * m2Shape[2];
-          subsum += (data1[idx1] * data2[idx2]);
-        };
-        newVector[j + i * m1Shape[3]] = subsum;
-      }; 
-    };
-
-    Mat<std::vector<float>> newMat(newVector, newShape);
+    Mat<std::vector<T>> newMat(mat1, mat1.shape());
     return newMat;
   };
 
-// Mat<std::vector<T>>& mat, std::vector<int>& indices
   
-  Mat<std::vector<float>> Conv2d(Mat<std::vector<float>>, int in_channels, int out_channels, int kernel, int padding, int stride) {
-
+  template <typename T> Mat<std::vector<T>> Conv2d(Mat<std::vector<T>>& mat, int in_channels, int out_channels, int kernel, int padding, int stride) {
+    Mat<std::vector<T>> newMat(mat, mat.shape());
+    return newMat;
   };
 };
 
