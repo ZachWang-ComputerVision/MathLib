@@ -15,7 +15,11 @@ int main() {
       a[3] = 33;
     };
     std::cout << a[i] << std::endl;
-  }
+  };
+
+  
+
+  
 
   // std::vector<int> a = {1,2,3,4,5,6};
   // std::vector<int> b = {1,1,2,3};

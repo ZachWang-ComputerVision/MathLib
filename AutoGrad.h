@@ -7,7 +7,7 @@
 
 class Tensor{
   public:
-    Tensor(MathLib::Mat<std::vector<float>> data, bool grad, std::list<int> dependencies) {
+    Tensor(NNLib::Mat<std::vector<float>> data, bool grad, std::list<int> dependencies) {
       
     };
 

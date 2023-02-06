@@ -1,28 +1,33 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include <cmath>
 
 #ifndef NNLIB_H
 #define NNLIB_H
 
 namespace NNLib {
   
-  template <class T> class Mat {
+  template <class T> class Tensor {
     private:
       std::vector<int> dims;
+      int size = 1;
     public:
       T data;
-      Mat(T& matrix, std::vector<int>& matShape) {
-        for (int i = 0; i < matShape.size(); i++) {
-          if (matShape[i] < 1) {
+      Tensor(T& matrix, std::vector<int>& matShape) {
+        for (int item : matShape) {
+          if (item < 1) {
             throw std::invalid_argument("All dimensional axis must be above 1, such as {1, 1, 2, 2}");
           };
+          size *= item;
         };
         data = matrix;
         dims = matShape;
       };
 
       std::vector<int> shape() { return dims; };
+
+      int capacity() { return size; };
 
       void reshape(std::vector<int>& newShape) {
         int curSize = 1;
@@ -44,60 +49,60 @@ namespace NNLib {
 
       void print() {};
 
-      ~Mat() {};
+      ~Tensor() {};
   };
 
 
-  template <typename T> Mat<std::vector<T>> zeros(std::vector<int>& shape) {
+  template <typename T> Tensor<std::vector<T>> zeros(std::vector<int>& shape) {
     int size = 1;
     for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
     std::vector<T> vec(size, 0.0);
-    Mat<std::vector<T>> mat(vec, shape);
+    Tensor<std::vector<T>> mat(vec, shape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> ones(std::vector<int>& shape) {
+  template <typename T> Tensor<std::vector<T>> ones(std::vector<int>& shape) {
     int size = 1;
     for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
     std::vector<T> vec(size, 1.0);
-    Mat<std::vector<T>> mat(vec, shape);
+    Tensor<std::vector<T>> mat(vec, shape);
     return mat;
   };
 
 
-  Mat<std::vector<int>> randomInt(std::vector<int>& shape) {
+  Tensor<std::vector<int>> randomInt(std::vector<int>& shape) {
     int size = 1;
     for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
     std::vector<int> vec;
     vec.reserve(size);
     for (int i = 0; i < size; i++) { vec[i] = (int)(rand() % 100); };
-    Mat<std::vector<int>> mat(vec, shape);
+    Tensor<std::vector<int>> mat(vec, shape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> randomDecimal(std::vector<int>& shape) {
+  template <typename T> Tensor<std::vector<T>> randomDecimal(std::vector<int>& shape) {
     int size = 1;
     for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
     std::vector<T> vec;
     vec.reserve(size);
     for (int i = 0; i < size; i++) { vec[i] = (T)(rand() % 100) / 100.0; };
-    Mat<std::vector<T>> mat(vec, shape);
+    Tensor<std::vector<T>> mat(vec, shape);
     return mat;
   };
 
 
-  Mat<std::vector<bool>> boolean(bool state, std::vector<int>& shape) {
+  Tensor<std::vector<bool>> boolean(bool state, std::vector<int>& shape) {
     int size = 1;
     for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
     std::vector<bool> vec(size, state);
-    Mat<std::vector<bool>> mat(vec, shape);
+    Tensor<std::vector<bool>> mat(vec, shape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> eye(std::vector<int>& shape) {
+  template <typename T> Tensor<std::vector<T>> eye(std::vector<int>& shape) {
     int last2nd = shape[shape.size() - 2];
     int last1st = shape[shape.size() - 1];
     if (last2nd != last1st) { 
@@ -115,7 +120,7 @@ namespace NNLib {
       };
     };
 
-    Mat<std::vector<T>> mat(vec, shape);
+    Tensor<std::vector<T>> mat(vec, shape);
     return mat;
   };
 
@@ -191,7 +196,7 @@ namespace NNLib {
   // };
 
 
-  template <typename T> Mat<std::vector<T>> concat(Mat<std::vector<T>>& matrix1, std::vector<T>& matrix2, int& dim) {
+  template <typename T> Tensor<std::vector<T>> concat(Tensor<std::vector<T>>& matrix1, std::vector<T>& matrix2, int& dim) {
     std::vector<int> shape1 = matrix1.shape();
     std::vector<int> shape2 = matrix2.shape();
     if (dim < 0 || dim > shape1.size() - 1) { throw std::invalid_argument("Dimension is out of range."); };
@@ -243,12 +248,12 @@ namespace NNLib {
         newMatIdx++;
       };
     };
-    Mat<std::vector<T>> mat(newMat, newShape);
+    Tensor<std::vector<T>> mat(newMat, newShape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> transpose(Mat<std::vector<T>>& matrix, int idxA, int idxB) { 
+  template <typename T> Tensor<std::vector<T>> transpose(Tensor<std::vector<T>>& matrix, int idxA, int idxB) { 
     std::vector<int> shape = matrix.shape();
     std::vector<T> data = matrix.data;
     
@@ -294,19 +299,69 @@ namespace NNLib {
       };
     };
 
-    Mat<std::vector<T>> mat(newMatrix, shape);
+    Tensor<std::vector<T>> mat(newMatrix, shape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> permute(Mat<std::vector<T>>& matrix, int& idxA, int& idxB) {
+  template <typename T> Tensor<std::vector<T>> permute(Tensor<std::vector<T>>& matrix, int& idxA, int& idxB) {
     std::vector<int> shape = matrix.shape();
-    Mat<std::vector<T>> mat(matrix, shape);
+    Tensor<std::vector<T>> mat(matrix, shape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> mat_add(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
+  // Implement a function for arithmatic calculation
+
+  template <typename T> void recur(std::vector<T>& newVector, Tensor<std::vector<T>>& m1, Tensor<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
+    std::vector<int> shape1 = m1.shape();
+    std::vector<int> shape2 = m2.shape();
+
+    if (dimPrt == shape1.size() - 1) {
+      if (shape1[dimPrt] == shape2[dimPrt]) {
+        for (i = 0; i < e1 - s1 + 1; i ++) {
+          newVector[idx] = m1.data[i + s1] * m2.data[i + s2];  // Implement a function for arithmatic calculation
+          idx ++;
+        };
+      };
+      else {
+        for (int i = s1; i < e1; i ++) {
+          for (int j = s2; j < e2; j ++) {
+            newVector[idx] = m1.data[i] * m2.data[j];  // Implement a function for arithmatic calculation
+            idx ++;
+          };
+        };
+      };
+    }
+    else {
+      int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
+      int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
+      int nextDimPrt = dimPrt + 1;
+      if (shape1[dimPrt] == shape2[dimPrt]) {
+        for (int i = 0; i < shape1[dimPrt]; i ++) {
+          int newS1 = s1 + i * chunk1;
+          int newE1 = e1 + i * chunk1;
+          int newS2 = s2 + i * chunk2;
+          int newE2 = e2 + i * chunk2;
+          recur<T>(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+        };
+      }
+      else {
+        for (int i = 0; i < shape1[dimPrt], i ++) {
+          int newS1 = s1 + i * chunk1;
+          int newE1 = e1 + i * chunk1;
+          for (int j = 0; j < shape2[dimPrt], j ++) {
+            int newS2 = s2 + i * chunk2;
+            int newE2 = e2 + i * chunk2;
+            recur<T>(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+          };
+        };
+      };
+    };
+  };
+
+
+  template <typename T> Tensor<std::vector<T>> mat_add(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
     std::vector<int> newShape(m1Shape.size(), 1);
@@ -336,61 +391,13 @@ namespace NNLib {
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-
-    void recur(std::vector<T>& newVector, Mat<std::vector<T>>& m1, Mat<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
-      std::vector<int> shape1 = m1.shape();
-      std::vector<int> shape2 = m2.shape();
-
-      if (dimPrt == shape1.size() - 1) {
-        if (shape1[dimPrt] == shape2[dimPrt]) {
-          for (i = 0; i < e1 - s1 + 1; i ++) {
-            newVector[idx] = m1.data[i + s1] + m2.data[i + s2];
-            idx ++;
-          };
-        };
-        else {
-          for (int i = s1; i < e1; i ++) {
-            for (int j = s2; j < e2; j ++) {
-              newVector[idx] = m1.data[i] + m2.data[j];
-              idx ++;
-            };
-          };
-        };
-      }
-      else {
-        int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
-        int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
-        int nextDimPrt = dimPrt + 1;
-        if (shape1[dimPrt] == shape2[dimPrt]) {
-          for (int i = 0; i < shape1[dimPrt]; i ++) {
-            int newS1 = s1 + i * chunk1;
-            int newE1 = e1 + i * chunk1;
-            int newS2 = s2 + i * chunk2;
-            int newE2 = e2 + i * chunk2;
-            recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
-          };
-        }
-        else {
-          for (int i = 0; i < shape1[dimPrt], i ++) {
-            int newS1 = s1 + i * chunk1;
-            int newE1 = e1 + i * chunk1;
-            for (int j = 0; j < shape2[dimPrt], j ++) {
-              int newS2 = s2 + i * chunk2;
-              int newE2 = e2 + i * chunk2;
-              recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
-            };
-          };
-        };
-      };
-    };
-
-    recur(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2)
-    Mat<std::vector<T>> mat(newVector, newShape);
+    recur<T>(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    Tensor<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> mat_sub(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
+  template <typename T> Tensor<std::vector<T>> mat_sub(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
     std::vector<int> newShape(m1Shape.size(), 1);
@@ -420,61 +427,13 @@ namespace NNLib {
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-
-    void recur(std::vector<T>& newVector, Mat<std::vector<T>>& m1, Mat<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
-      std::vector<int> shape1 = m1.shape();
-      std::vector<int> shape2 = m2.shape();
-
-      if (dimPrt == shape1.size() - 1) {
-        if (shape1[dimPrt] == shape2[dimPrt]) {
-          for (i = 0; i < e1 - s1 + 1; i ++) {
-            newVector[idx] = m1.data[i + s1] - m2.data[i + s2];
-            idx ++;
-          };
-        };
-        else {
-          for (int i = s1; i < e1; i ++) {
-            for (int j = s2; j < e2; j ++) {
-              newVector[idx] = m1.data[i] - m2.data[j];
-              idx ++;
-            };
-          };
-        };
-      }
-      else {
-        int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
-        int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
-        int nextDimPrt = dimPrt + 1;
-        if (shape1[dimPrt] == shape2[dimPrt]) {
-          for (int i = 0; i < shape1[dimPrt]; i ++) {
-            int newS1 = s1 + i * chunk1;
-            int newE1 = e1 + i * chunk1;
-            int newS2 = s2 + i * chunk2;
-            int newE2 = e2 + i * chunk2;
-            recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
-          };
-        }
-        else {
-          for (int i = 0; i < shape1[dimPrt], i ++) {
-            int newS1 = s1 + i * chunk1;
-            int newE1 = e1 + i * chunk1;
-            for (int j = 0; j < shape2[dimPrt], j ++) {
-              int newS2 = s2 + i * chunk2;
-              int newE2 = e2 + i * chunk2;
-              recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
-            };
-          };
-        };
-      };
-    };
-
-    recur(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2)
-    Mat<std::vector<T>> mat(newVector, newShape);
+    recur<T>(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    Tensor<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> mat_mul(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
+  template <typename T> Tensor<std::vector<T>> mat_mul(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
     std::vector<int> newShape(m1Shape.size(), 1);
@@ -504,61 +463,13 @@ namespace NNLib {
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-
-    void recur(std::vector<T>& newVector, Mat<std::vector<T>>& m1, Mat<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
-      std::vector<int> shape1 = m1.shape();
-      std::vector<int> shape2 = m2.shape();
-
-      if (dimPrt == shape1.size() - 1) {
-        if (shape1[dimPrt] == shape2[dimPrt]) {
-          for (i = 0; i < e1 - s1 + 1; i ++) {
-            newVector[idx] = m1.data[i + s1] * m2.data[i + s2];
-            idx ++;
-          };
-        };
-        else {
-          for (int i = s1; i < e1; i ++) {
-            for (int j = s2; j < e2; j ++) {
-              newVector[idx] = m1.data[i] * m2.data[j];
-              idx ++;
-            };
-          };
-        };
-      }
-      else {
-        int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
-        int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
-        int nextDimPrt = dimPrt + 1;
-        if (shape1[dimPrt] == shape2[dimPrt]) {
-          for (int i = 0; i < shape1[dimPrt]; i ++) {
-            int newS1 = s1 + i * chunk1;
-            int newE1 = e1 + i * chunk1;
-            int newS2 = s2 + i * chunk2;
-            int newE2 = e2 + i * chunk2;
-            recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
-          };
-        }
-        else {
-          for (int i = 0; i < shape1[dimPrt], i ++) {
-            int newS1 = s1 + i * chunk1;
-            int newE1 = e1 + i * chunk1;
-            for (int j = 0; j < shape2[dimPrt], j ++) {
-              int newS2 = s2 + i * chunk2;
-              int newE2 = e2 + i * chunk2;
-              recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
-            };
-          };
-        };
-      };
-    };
-
-    recur(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2)
-    Mat<std::vector<T>> mat(newVector, newShape);
+    recur<T>(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    Tensor<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> mat_div(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
+  template <typename T> Tensor<std::vector<T>> mat_div(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
     std::vector<int> newShape(m1Shape.size(), 1);
@@ -588,71 +499,49 @@ namespace NNLib {
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-
-    void recur(std::vector<T>& newVector, Mat<std::vector<T>>& m1, Mat<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
-      std::vector<int> shape1 = m1.shape();
-      std::vector<int> shape2 = m2.shape();
-
-      if (dimPrt == shape1.size() - 1) {
-        if (shape1[dimPrt] == shape2[dimPrt]) {
-          for (i = 0; i < e1 - s1 + 1; i ++) {
-            newVector[idx] = m1.data[i + s1] / m2.data[i + s2];
-            idx ++;
-          };
-        };
-        else {
-          for (int i = s1; i < e1; i ++) {
-            for (int j = s2; j < e2; j ++) {
-              newVector[idx] = m1.data[i] / m2.data[j];
-              idx ++;
-            };
-          };
-        };
-      }
-      else {
-        int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
-        int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
-        int nextDimPrt = dimPrt + 1;
-        if (shape1[dimPrt] == shape2[dimPrt]) {
-          for (int i = 0; i < shape1[dimPrt]; i ++) {
-            int newS1 = s1 + i * chunk1;
-            int newE1 = e1 + i * chunk1;
-            int newS2 = s2 + i * chunk2;
-            int newE2 = e2 + i * chunk2;
-            recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
-          };
-        }
-        else {
-          for (int i = 0; i < shape1[dimPrt], i ++) {
-            int newS1 = s1 + i * chunk1;
-            int newE1 = e1 + i * chunk1;
-            for (int j = 0; j < shape2[dimPrt], j ++) {
-              int newS2 = s2 + i * chunk2;
-              int newE2 = e2 + i * chunk2;
-              recur(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
-            };
-          };
-        };
-      };
-    };
-
-    recur(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2)
-    Mat<std::vector<T>> mat(newVector, newShape);
+    recur<T>(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    Tensor<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
 
 
-  template <typename T> Mat<std::vector<T>> mat_dot(Mat<std::vector<T>>& mat1, Mat<std::vector<T>>& mat2) {
+  template <typename T> Tensor<std::vector<T>> mat_dot(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
     
-    Mat<std::vector<T>> newMat(mat1, mat1.shape());
+    Tensor<std::vector<T>> newMat(mat1, mat1.shape());
     return newMat;
   };
 
   
-  template <typename T> Mat<std::vector<T>> Conv2d(Mat<std::vector<T>>& mat, int in_channels, int out_channels, int kernel, int padding, int stride) {
-    Mat<std::vector<T>> newMat(mat, mat.shape());
+  template <typename T> Tensor<std::vector<T>> Conv2d(Tensor<std::vector<T>>& mat, int in_channels, int out_channels, int kernel, int padding, int stride) {
+    Tensor<std::vector<T>> newMat(mat, mat.shape());
     return newMat;
   };
+
+  template <typename T> Tensor<std::vector<T>> BatchNorm2D(Tensor<std::vector<T>>& mat) {
+    std::vector<int> shape = mat.shape();
+    T total = 0.0;
+    T size = 1.0;
+    for (T& item : mat.data) { total += item; };
+    for (int& s : shape) { size *= (T)s; };
+
+    T mean = total / size;
+    for (int i = 0; i < (int)size; i ++) { mat.data[i] -= mean}
+
+    Tensor<std::vector<T>> sigma = mat_sub(mat, meanVal);
+    sigma = mat_mul(diff, diff);
+
+  };
+
+  template <typename T> void ReLU(Tensor<std::vector<T>>& mat) {
+    T zero = 0.0;
+    for (auto& item : mat.data) { item = std::max(zero, item); };
+  };
+
+  template <typename T> void Sigmoid(Tensor<std::vector<T>>& mat) {
+    T one = 1.0;
+    for (auto& item : mat.data) { item = one / (one + std::exp(-item)); };
+  };
+  
 };
 
 #endif
@@ -661,10 +550,8 @@ namespace NNLib {
 //   template <typename T> std::vector<T> MLinear();
 //   template <typename T> std::vector<T> Conv2D();
 
-//   template <typename T> std::vector<T> BatchNorm2D();
+
 //   template <typename T> std::vector<T> LayerNorm();
-//   template <typename T> std::vector<T> Sigmoid();
-//   template <typename T> std::vector<T> ReLU();
 
 //   template <typename T> std::vector<T> SGD();
 //   template <typename T> std::vector<T> Adam();
