@@ -7,19 +7,28 @@ This project does not depend on external libaraies or packages. I implement the 
 
 I use C++ native data types. If you perfer defining your own data type, you still can use this package. Tp use this package, you just need to include the header files. Here are the functions:
 
+CPU (single-thread):
 - [x] Zeros, Ones, Bool, Random, Eye
+- [ ] zeros_like, ones_like, bools_like
 - [x] Slice, Reshape, Concatenate, Transpose, Permutate
 - [x] Matrix Addition, Subtraction, Multiplication, Division
 - [ ] Matrix Dot Product
+- [ ] Image normalization
 - [ ] Linear Layer, Multi-Layer Perceptron
 - [ ] Convolution2D
-- [x] He Weight Initialization
-- [x] BatchNorm2D, LayerNorm
+- [ ] He Weight Initialization
+- [ ] BatchNorm2D, LayerNorm
 - [x] Sigmoid, ReLU
-- [x] SGD, Adam
-- [x] Autograd
+- [x] Adam Optimizer
+- [ ] Autograd
 - [ ] Load, Save Weights
+
+/b
 
 - [ ] Multi-Thread
 - [x] CUDA
+
+/b
+More Deep Learning Architecture Comming
+
 

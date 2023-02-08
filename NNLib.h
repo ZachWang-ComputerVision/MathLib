@@ -3,55 +3,16 @@
 #include <cstdlib>
 #include <cmath>
 
+#include "Tensor.h"
+
 #ifndef NNLIB_H
 #define NNLIB_H
 
 namespace NNLib {
-  
-  template <class T> class Tensor {
-    private:
-      std::vector<int> dims;
-      int size = 1;
-    public:
-      T data;
-      Tensor(T& matrix, std::vector<int>& matShape) {
-        for (int item : matShape) {
-          if (item < 1) {
-            throw std::invalid_argument("All dimensional axis must be above 1, such as {1, 1, 2, 2}");
-          };
-          size *= item;
-        };
-        data = matrix;
-        dims = matShape;
-      };
 
-      std::vector<int> shape() { return dims; };
-
-      int capacity() { return size; };
-
-      void reshape(std::vector<int>& newShape) {
-        int curSize = 1;
-        int newSize = 1;
-
-        for (int i = 0; i < dims.size(); i++) {
-          curSize *= dims[i];
-        };
-        for (int i = 0; i < newShape.size(); i++) {
-          newSize *= newShape[i];
-        };
-
-        if (curSize == newSize) {
-          dims = newShape;
-        } else {
-          throw std::invalid_argument("The current shape cannot be converted to the new shape");
-        };
-      };
-
-      void print() {};
-
-      ~Tensor() {};
+  template <typename T> Tensor<std::vector<T>> normalize_imgs(Tensor<std::vector<T>>& mat, std::vector<int>& shift_values) {
+    
   };
-
 
   template <typename T> Tensor<std::vector<T>> zeros(std::vector<int>& shape) {
     int size = 1;
@@ -313,21 +274,21 @@ namespace NNLib {
 
   // Implement a function for arithmatic calculation
 
-  template <typename T> void recur(std::vector<T>& newVector, Tensor<std::vector<T>>& m1, Tensor<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
+  template <typename T> void perform_operation(T (*opera)(T, T), std::vector<T>& newVector, Tensor<std::vector<T>>& m1, Tensor<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
     std::vector<int> shape1 = m1.shape();
     std::vector<int> shape2 = m2.shape();
 
     if (dimPrt == shape1.size() - 1) {
       if (shape1[dimPrt] == shape2[dimPrt]) {
         for (i = 0; i < e1 - s1 + 1; i ++) {
-          newVector[idx] = m1.data[i + s1] * m2.data[i + s2];  // Implement a function for arithmatic calculation
+          newVector[idx] = opera(m1.data[i + s1], m2.data[i + s2]);  // Implement a function for arithmatic calculation
           idx ++;
         };
       };
       else {
         for (int i = s1; i < e1; i ++) {
           for (int j = s2; j < e2; j ++) {
-            newVector[idx] = m1.data[i] * m2.data[j];  // Implement a function for arithmatic calculation
+            newVector[idx] = opera(m1.data[i + s1], m2.data[i + s2]);  // Implement a function for arithmatic calculation
             idx ++;
           };
         };
@@ -343,7 +304,7 @@ namespace NNLib {
           int newE1 = e1 + i * chunk1;
           int newS2 = s2 + i * chunk2;
           int newE2 = e2 + i * chunk2;
-          recur<T>(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+          perform_operation<T>(opera, newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
         };
       }
       else {
@@ -353,19 +314,14 @@ namespace NNLib {
           for (int j = 0; j < shape2[dimPrt], j ++) {
             int newS2 = s2 + i * chunk2;
             int newE2 = e2 + i * chunk2;
-            recur<T>(newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+            perform_operation<T>(opera, newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
           };
         };
       };
     };
   };
 
-
-  template <typename T> Tensor<std::vector<T>> mat_add(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
-    std::vector<int> m1Shape = mat1.shape();
-    std::vector<int> m2Shape = mat2.shape();
-    std::vector<int> newShape(m1Shape.size(), 1);
-
+  void update_shape_n_size(std::vector<int>& m1Shape, std::vector<int>& m2Shape, std::vector<int>& newShape, int& newSize) {
     if (m1Shape.size() != m2Shape.size()) { 
       throw std::invalid_argument("The number of dimension is different between the two matrices."); 
     };
@@ -373,7 +329,6 @@ namespace NNLib {
       throw std::invalid_argument("The matrix cannot be empty."); 
     };
     
-    int newSize = 1;
     for (int i = 0; i < m1Shape.size(); i++) {
       if (m1Shape[i] != m2Shape[i]) {
         if (m1Shape[i] != 1 && m2Shape[i] != 1) {
@@ -385,13 +340,22 @@ namespace NNLib {
       newShape[i] = n;
       newSize *= n;
     };
+  };
+
+
+  template <typename T> Tensor<std::vector<T>> mat_add(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
+    std::vector<int> m1Shape = mat1.shape();
+    std::vector<int> m2Shape = mat2.shape();
+    std::vector<int> newShape(m1Shape.size(), 1);
+    int newSize = 1;
+    update_shape_n_size(m1Shape, m2Shape, newShape, newSize);
 
     std::vector<T> data1 = mat1.data;
     std::vector<T> data2 = mat2.data;
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-    recur<T>(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    perform_operation<T>([](T a, T b){ return a + b }, newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
     Tensor<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
@@ -401,33 +365,15 @@ namespace NNLib {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
     std::vector<int> newShape(m1Shape.size(), 1);
-
-    if (m1Shape.size() != m2Shape.size()) { 
-      throw std::invalid_argument("The number of dimension is different between the two matrices."); 
-    };
-    if (m1Shape.size() < 1) {
-      throw std::invalid_argument("The matrix cannot be empty."); 
-    };
-    
     int newSize = 1;
-    for (int i = 0; i < m1Shape.size(); i++) {
-      if (m1Shape[i] != m2Shape[i]) {
-        if (m1Shape[i] != 1 && m2Shape[i] != 1) {
-          throw std::invalid_argument("The dimensions are incompatible.");
-        };
-      };
-
-      int n = std::max(m1Shape[i], m2Shape[i]);
-      newShape[i] = n;
-      newSize *= n;
-    };
+    update_shape_n_size(m1Shape, m2Shape, newShape, newSize);
 
     std::vector<T> data1 = mat1.data;
     std::vector<T> data2 = mat2.data;
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-    recur<T>(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    perform_operation<T>([](T a, T b){ return a - b }, newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
     Tensor<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
@@ -437,33 +383,15 @@ namespace NNLib {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
     std::vector<int> newShape(m1Shape.size(), 1);
-
-    if (m1Shape.size() != m2Shape.size()) { 
-      throw std::invalid_argument("The number of dimension is different between the two matrices."); 
-    };
-    if (m1Shape.size() < 1) {
-      throw std::invalid_argument("The matrix cannot be empty."); 
-    };
-    
     int newSize = 1;
-    for (int i = 0; i < m1Shape.size(); i++) {
-      if (m1Shape[i] != m2Shape[i]) {
-        if (m1Shape[i] != 1 && m2Shape[i] != 1) {
-          throw std::invalid_argument("The dimensions are incompatible.");
-        };
-      };
-
-      int n = std::max(m1Shape[i], m2Shape[i]);
-      newShape[i] = n;
-      newSize *= n;
-    };
+    update_shape_n_size(m1Shape, m2Shape, newShape, newSize);
 
     std::vector<T> data1 = mat1.data;
     std::vector<T> data2 = mat2.data;
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-    recur<T>(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    perform_operation<T>([](T a, T b){ return a * b }, newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
     Tensor<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
@@ -473,33 +401,15 @@ namespace NNLib {
     std::vector<int> m1Shape = mat1.shape();
     std::vector<int> m2Shape = mat2.shape();
     std::vector<int> newShape(m1Shape.size(), 1);
-
-    if (m1Shape.size() != m2Shape.size()) { 
-      throw std::invalid_argument("The number of dimension is different between the two matrices."); 
-    };
-    if (m1Shape.size() < 1) {
-      throw std::invalid_argument("The matrix cannot be empty."); 
-    };
-    
     int newSize = 1;
-    for (int i = 0; i < m1Shape.size(); i++) {
-      if (m1Shape[i] != m2Shape[i]) {
-        if (m1Shape[i] != 1 && m2Shape[i] != 1) {
-          throw std::invalid_argument("The dimensions are incompatible.");
-        };
-      };
-
-      int n = std::max(m1Shape[i], m2Shape[i]);
-      newShape[i] = n;
-      newSize *= n;
-    };
+    update_shape_n_size(m1Shape, m2Shape, newShape, newSize);
 
     std::vector<T> data1 = mat1.data;
     std::vector<T> data2 = mat2.data;
     std::vector<T> newVector;
     newVector.reserve(newSize);
 
-    recur<T>(newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    perform_operation<T>([](T a, T b){ return a / b }, newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
     Tensor<std::vector<T>> mat(newVector, newShape);
     return mat;
   };
@@ -518,17 +428,15 @@ namespace NNLib {
   };
 
   template <typename T> Tensor<std::vector<T>> BatchNorm2D(Tensor<std::vector<T>>& mat) {
-    std::vector<int> shape = mat.shape();
-    T total = 0.0;
-    T size = 1.0;
-    for (T& item : mat.data) { total += item; };
-    for (int& s : shape) { size *= (T)s; };
-
-    T mean = total / size;
-    for (int i = 0; i < (int)size; i ++) { mat.data[i] -= mean}
-
-    Tensor<std::vector<T>> sigma = mat_sub(mat, meanVal);
-    sigma = mat_mul(diff, diff);
+    /*
+    num_features, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True, device=None, dtype=None
+    
+    num_features (int) – CC from an expected input of size (N, C, H, W)(N,C,H,W)
+    eps (float) – a value added to the denominator for numerical stability. Default: 1e-5
+    momentum (float) – the value used for the running_mean and running_var computation. Can be set to None for cumulative moving average (i.e. simple average). Default: 0.1
+    affine (bool) – a boolean value that when set to True, this module has learnable affine parameters. Default: True
+    track_running_stats (bool) – a boolean value that when set to True, this module tracks the running mean and variance, and when set to False, this module does not track such statistics, and initializes statistics buffers running_mean and running_var as None. When these buffers are None, this module always uses batch statistics. in both training and eval modes. Default: True
+    */
 
   };
 
@@ -544,6 +452,15 @@ namespace NNLib {
   
 };
 
+// Adam  https://pytorch.org/docs/stable/generated/torch.optim.Adam.html
+// WightInit  https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
+// AutoGrad  https://github.com/joelgrus/autograd/blob/part06/tests/test_tensor_matmul.py
+//           https://github.com/joelgrus/autograd/blob/part06/autograd/tensor.py
+
+// CUDA  https://forums.developer.nvidia.com/t/how-to-call-cuda-function-from-c-file/61986/3
+//       https://forums.developer.nvidia.com/t/how-to-use-class-in-cuda-c/61761
+// CUDA  From Scratch
+
 #endif
 
 //   template <typename T> std::vector<T> Linear();
@@ -553,7 +470,6 @@ namespace NNLib {
 
 //   template <typename T> std::vector<T> LayerNorm();
 
-//   template <typename T> std::vector<T> SGD();
 //   template <typename T> std::vector<T> Adam();
 
 //   template <typename T> std::vector<T> save();
