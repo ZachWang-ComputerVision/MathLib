@@ -5,23 +5,25 @@
 
 
 // #include "NNLib.h"
-
-void test(int t[]) {
-  for (int i = 0; i < 5; i++) {
-    std::cout << "in func: " << t[i] << std::endl;
-  };
-};
+#include "Tensor.h"
+// #include "test.cuh"
 
 int main() {
 
-  // std::vector<int> a = {1,2,3,4,5,6};
-  // std::vector<int> b = {1,1,2,3};
-  // std::vector<float> vec;
-  // vec.reserve(10);
-  // for (int i = 0; i < 10; i++) { vec.push_back( (float)(rand() % 100) / 100); };
-  // for (int i = 0; i < 10; i++) {
-  //   std::cout << vec[i] << ",";
-  // }; std::cout << std::endl;
+  int a[] = {0,1,2,3,4,5};
+  int b = 1;
+  size_t c = 5;
+  NNLib::Tensor<int> tensor(b, c);
+  std::cout << tensor.matrix_size() << std::endl;
+  std::cout << tensor.shape_size() << std::endl;
+  int nS[] = {5,1};
+  size_t u = 2;
+  tensor.reshape(nS, u);
+  std::cout << tensor.matrix_size() << std::endl;
+  std::cout << tensor.shape_size() << std::endl;
+
+
+  // Wrapper::wrapper();
 
   // MathLib::Mat<std::vector<int>> mat(a, b);
   // MathLib::Mat<std::vector<int>> c = MathLib::zeros<int>(b);

@@ -10,7 +10,7 @@ namespace NNLib {
       size_t m_Size = 0;
       size_t s_Size = 0;
       size_t capacity = 0;
-      int dims[];
+      int* dims;
 
       void ReAlloc(size_t& newCapacity) {
         T* newBlock = new T[newCapacity];
@@ -23,7 +23,8 @@ namespace NNLib {
         delete[] data;
         data = newBlock;
         capacity = newCapacity;
-        dims = {1, m_Size};
+        int specify_size[] = {1, (int)m_Size};
+        dims = specify_size;
         s_Size = 2;
       };
 
@@ -36,7 +37,8 @@ namespace NNLib {
         delete[] data;
         data = newBlock;
         capacity = newCapacity;
-        dims = {1, m_Size};
+        int specify_size[] = {1, (int)m_Size};
+        dims = specify_size;
         s_Size = 2;
       };
 
@@ -53,15 +55,15 @@ namespace NNLib {
     public:
       Tensor() { ReAlloc(1); };
       Tensor(size_t& n) { ReAlloc(n); };
-      Tensor(T& item, size_t& n) { ReAlloc(n, item); };
+      Tensor(T& item, size_t& n) { ReAlloc(item, n); };
       Tensor(T matrix[], size_t& m_Size, int matShape[], size_t& s_Size) {
         size_t matrix_Size = 1;
         size_t shape_Size = 0;
-        for (int& item : matShape) {
-          if (item < 1) {
+        for (int i = 0; i < (int)s_Size; i ++) {
+          if (matShape[i] < 1) {
             throw std::invalid_argument("All dimensional axis must be above 1, such as {1, 1, 2, 2}");
           };
-          matrix_Size *= item;
+          matrix_Size *= matShape[i];
           shape_Size ++;
         };
         
@@ -77,14 +79,14 @@ namespace NNLib {
 
       size_t matrix_size() const { return m_Size; };
 
-      void reshape(int& newShape, size_t new_s_Size) {
+      void reshape(int newShape[], size_t new_s_Size) {
         size_t new_m = 1;
         size_t n_new_s = 0;
-        for (int& n : newShape) {
-          if (item < 1) {
+        for (int i = 0; i < (int)new_s_Size; i ++) {
+          if (newShape[i] < 1) {
             throw std::invalid_argument("All dimensional axis must be above 1, such as {1, 1, 2, 2}");
           };
-          new_m *= n;
+          new_m *= newShape[i];
           n_new_s ++;
         }
 
@@ -114,7 +116,6 @@ namespace NNLib {
 
       ~Tensor() {
         delete[] data;
-        delete[] dims;
       };
   };
 }
