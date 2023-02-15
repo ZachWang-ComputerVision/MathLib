@@ -23,12 +23,10 @@ CPU (single-thread):
 - [ ] Autograd
 - [ ] Load, Save Weights
 
-/b
+<br>
 
 - [ ] Multi-Thread
-- [x] CUDA
+- [ ] CUDA
 
-/b
-More Deep Learning Architecture Comming
 
 
