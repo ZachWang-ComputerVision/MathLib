@@ -10,69 +10,105 @@
 
 namespace NNLib {
 
-  template <typename T> Tensor<std::vector<T>> normalize_imgs(Tensor<std::vector<T>>& mat, std::vector<int>& shift_values) {
+  template <typename T> Tensor<T> normalize_imgs(Tensor<T>& mat, std::vector<int>& shift_values) {
     
   };
 
-  template <typename T> Tensor<std::vector<T>> zeros(std::vector<int>& shape) {
+  template <typename T> Tensor<T> zeros(int shape[], size_t shape_size) {
     int size = 1;
     for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
-    std::vector<T> vec(size, 0.0);
-    Tensor<std::vector<T>> mat(vec, shape);
-    return mat;
+
+    T vec[size];
+    for (int i = 0; i < size; i++) { vec[i] = (T)0.0; };
+
+    Tensor<T> tensor(vec, (size_t)size, shape, shape_size);
+    return tensor;
   };
 
+  template <typename T> Tensor<T> zeros_like(Tensor<T>& tensor) {
+    int shape = tensor.matrix_shape();
+    size_t shape_size = tensor.shape_size();
 
-  template <typename T> Tensor<std::vector<T>> ones(std::vector<int>& shape) {
     int size = 1;
-    for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
-    std::vector<T> vec(size, 1.0);
-    Tensor<std::vector<T>> mat(vec, shape);
-    return mat;
+    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+
+    T new_vec[size];
+    for (int i = 0; i < size; i++) { new_vec[i] = (T)0.0; };
+
+    Tensor<T> new_tensor(new_vec, (size_t)size, shape, shape_size);
+    return new_tensor;
   };
 
-
-  Tensor<std::vector<int>> randomInt(std::vector<int>& shape) {
+  template <typename T> Tensor<T> ones(int shape[], size_t shape_size) {
     int size = 1;
     for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
-    std::vector<int> vec;
-    vec.reserve(size);
+
+    T vec[size];
+    for (int i = 0; i < size; i++) { vec[i] = (T)1.0; };
+    
+    Tensor<T> tensor(vec, (size_t)size, shape, shape_size);
+    return tensor;
+  };
+
+  template <typename T> Tensor<T> ones_like(Tensor<T>& tensor) {
+    int shape = tensor.matrix_shape();
+    size_t shape_size = tensor.shape_size();
+
+    int size = 1;
+    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    
+    T new_vec[size];
+    for (int i = 0; i < size; i++) { new_vec[i] = (T)1.0; };
+
+    Tensor<T> new_tensor(new_vec, (size_t)size, shape, shape_size);
+    return new_tensor;
+  };
+
+  Tensor<int> randomInt(int shape[], size_t shape_size) {
+    int size = 1;
+    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    
+    int vec[size];
     for (int i = 0; i < size; i++) { vec[i] = (int)(rand() % 100); };
-    Tensor<std::vector<int>> mat(vec, shape);
-    return mat;
+
+    Tensor<int> tensor(vec, (size_t)size, shape, shape_size);
+    return tensor;
   };
 
-
-  template <typename T> Tensor<std::vector<T>> randomDecimal(std::vector<int>& shape) {
+  template <typename T> Tensor<T> randomDecimal(int shape[], size_t shape_size) {
     int size = 1;
-    for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
-    std::vector<T> vec;
-    vec.reserve(size);
-    for (int i = 0; i < size; i++) { vec[i] = (T)(rand() % 100) / 100.0; };
-    Tensor<std::vector<T>> mat(vec, shape);
-    return mat;
+    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    
+    T vec[size];
+    for (int i = 0; i < size; i++) { vec[i] = (T)(rand() % 100) / (T)100.0; };
+
+    Tensor<T> tensor(vec, (size_t)size, shape, shape_size);
+    return tensor;
   };
 
-
-  Tensor<std::vector<bool>> boolean(bool state, std::vector<int>& shape) {
+  Tensor<bool> boolean(bool state, int shape[], size_t shape_size) {
     int size = 1;
-    for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
-    std::vector<bool> vec(size, state);
-    Tensor<std::vector<bool>> mat(vec, shape);
-    return mat;
+    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    
+    bool vec[size];
+    for (int i = 0; i < size; i++) { vec[i] = state; };
+
+    Tensor<bool> tensor(vec, (size_t)size, shape, shape_size);
+    return tensor;
   };
 
 
-  template <typename T> Tensor<std::vector<T>> eye(std::vector<int>& shape) {
-    int last2nd = shape[shape.size() - 2];
-    int last1st = shape[shape.size() - 1];
+  template <typename T> Tensor<T> eye(int shape[], size_t shape_size) {
+    int last2nd = shape[shape_size - 2];
+    int last1st = shape[shape_size - 1];
     if (last2nd != last1st) { 
       throw std::invalid_argument("The inside matrix is not a square"); 
     };
     int size = 1;
-    for (int i = 0; i < shape.size; i++) { size *= shape[i]; };
+    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
     
-    std::vector<T> vec(size, 0.0);
+    T vec[size];
+    for (int i = 0; i < size; i++) { vec[i] = (T)0.0; };
 
     for (int i = 0; i < size / (last2nd * last1st); i++) {
       for (int j = 0; j < last1st; j++) {
@@ -81,80 +117,81 @@ namespace NNLib {
       };
     };
 
-    Tensor<std::vector<T>> mat(vec, shape);
-    return mat;
+    Tensor<T> tensor(vec, (size_t)size, shape, shape_size);
+    return tensor;
   };
 
 
-  // template <typename T> Mat<std::vector<T>> slice(Mat<std::vector<T>>& mat, std::vector<int>& indices) {
-  //   std::vector<T> data = mat.data;
-  //   std::vector<int> shape = mat.shape();
-  //   std::vector<int> newShape;
+  template <typename T> Tensor<T> slice(Tensor<T>& tensor, int shape[][2], size_t shape_size) {
 
-  //   // pos contains all the starting indices and keeps tracking if there is any dimension is 
+    int shape = tensor.matrix_shape();
+    int new_shape[(int)shape_size];
+    if (shape_size % 2 != 0) { throw std::invalid_argument("The shape size cannot be an odd number."); };
+    if (shape_size / 2 != tensor.shape_size()) { throw std::invalid_argument("The dimension of the slice must match the dimension of the target tensor."); };
 
-  //   int newSize = 1;
-  //   for (int i = 0; i < indices.size(); i++) {
-  //     if (indices[i].size() != 2) { throw std::invalid_argument("One of axis's slicing indices is in a wrong form"); };
-  //     int s = indices[i][0];
-  //     int e = indices[i][1];
-  //     if (e < s) { throw std::invalid_argument("Begining or end index is set wrong."); };
-  //     if (s < 0 || e > shape[i]) { throw std::invalid_argument("Index is out of range."); };
-  //     int dimVal = e - s + 1;
-  //     newSize *= dimVal;
-  //     newShape.push_back(dimVal);
-  //   };
+    // pos contains all the starting indices and keeps tracking if there is any dimension is 
 
-  //   std::vector<T> subVec;
-  //   subVec.reserve(newSize);
+    int new_size = 1;
+    for (int i = 0; i < (int)shape_size / 2; i++) {
+      int s = shape[i][0];
+      int e = shape[i][1];
+      if (e < s) { throw std::invalid_argument("Begining or end index is set wrong."); };
+      if (s < 0 || e > shape[i]) { throw std::invalid_argument("Index is out of range."); };
+      int dim_val = e - s + 1;
+      new_size *= dim_val;
+      new_shape[i] = dim_val;
+    };
 
-  //   bool end = false;
-  //   int count = 0;
-  //   int chunk = newShape.back();
-  //   // int idx = pos.back();
-  //   while (end != true) {
-  //     // Going through the list in backwards to calculate the index.
-  //     for (int i = newShape.size() - 2; i > -1; i--) {
+    T sub_vec[new_size];
+
+    bool end = false;
+    int count = 0;
+    int last_dim = (int)shape_size / 2 - 1;
+    int chunk = shape[last_dim][0] * shape[last_dim][1];
+    // int idx = pos.back();
+    while (end != true) {
+      // Going through the list in backwards to calculate the index.
+      for (int i = new_size - 2; i > -1; i--) {
         
-  //       // Get position and push the items into the subVec
-  //       for (int k = shape.size() - 2; k > -1; k--) {
-  //         idx += pos[k] * chunk;
-  //         newMat[count] = data[idx];
-  //         count++;
-  //         pos[i]++;
-  //       };
+        // Get position and push the items into the subVec
+        for (int k = (int)tensor.shape_size() - 2; k > -1; k--) {
+          idx += pos[k] * chunk;
+          newMat[count] = tensor[idx];
+          count++;
+          pos[i]++;
+        };
 
-  //       // Check if the axis's end is reached or not. If it does, update the pos track
-  //       if (pos[i] == indices[i][1]) {
-  //         if (i > 0) {
-  //           pos[i - 1]++;
+        // Check if the axis's end is reached or not. If it does, update the pos track
+        if (pos[i] == indices[i][1]) {
+          if (i > 0) {
+            pos[i - 1]++;
             
-  //         }
+          }
 
-  //         for (int k = i; k < pose.size(); k++) {
-  //           pos[i] = indices[i][0];
-  //         };
+          for (int k = i; k < pose.size(); k++) {
+            pos[i] = indices[i][0];
+          };
 
-  //         // All the axis are upda
-  //         else {
-  //           // check if all axis meet the end
-  //           int count_req = 0;
-  //           for (int n = 1; n < pose.size(); n++) {
-  //             if (pos[n] == indices[i][1]) {
-  //               count_req++;
-  //             };
-  //           };
-  //           if ()
-  //           end = true;
-  //         }
+          // All the axis are upda
+          else {
+            // check if all axis meet the end
+            int count_req = 0;
+            for (int n = 1; n < pose.size(); n++) {
+              if (pos[n] == indices[i][1]) {
+                count_req++;
+              };
+            };
+            if ()
+            end = true;
+          }
 
-  //       };
-  //     };
-  //   };
+        };
+      };
+    };
     
-  //   Mat<std::vector<T>> subMat(subVec, newSize);
-  //   return subMat;
-  // };
+    Mat<std::vector<T>> subMat(subVec, newSize);
+    return subMat;
+  };
 
 
   template <typename T> Tensor<std::vector<T>> concat(Tensor<std::vector<T>>& matrix1, std::vector<T>& matrix2, int& dim) {
