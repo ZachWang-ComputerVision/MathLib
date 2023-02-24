@@ -73,7 +73,7 @@ namespace NNLib {
         realloc(matrix, m_Size, mat_shape, s_Size);
       };
 
-      int matrix_shape() const { return dims; };
+      int* matrix_shape() const { return dims; };
 
       size_t shape_size() const { return s_Size; };
 

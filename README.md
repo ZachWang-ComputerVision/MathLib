@@ -9,7 +9,7 @@ I use C++ native data types. If you perfer defining your own data type, you stil
 
 CPU (single-thread):
 - [x] Zeros, Ones, Bool, Random, Eye
-- [ ] zeros_like, ones_like, bools_like
+- [x] zeros_like, ones_like, bools_like
 - [x] Slice, Reshape, Concatenate, Transpose, Permutate
 - [x] Matrix Addition, Subtraction, Multiplication, Division
 - [ ] Matrix Dot Product
@@ -18,8 +18,8 @@ CPU (single-thread):
 - [ ] Convolution2D
 - [ ] He Weight Initialization
 - [ ] BatchNorm2D, LayerNorm
-- [x] Sigmoid, ReLU
-- [x] Adam Optimizer
+- [ ] Sigmoid, ReLU
+- [ ] Adam Optimizer
 - [ ] Autograd
 - [ ] Load, Save Weights
 

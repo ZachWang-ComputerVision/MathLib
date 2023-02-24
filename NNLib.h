@@ -10,90 +10,86 @@
 
 namespace NNLib {
 
-  template <typename T> Tensor<T> normalize_imgs(Tensor<T>& mat, std::vector<int>& shift_values) {
-    
-  };
-
   template <typename T> Tensor<T> zeros(int shape[], size_t shape_size) {
-    int size = 1;
-    for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
+    size_t size = 1;
+    for (size_t i = 0; i < shape_size; i++) { size *= shape[i]; };
 
     T vec[size];
-    for (int i = 0; i < size; i++) { vec[i] = (T)0.0; };
+    for (size_t i = 0; i < size; i++) { vec[i] = (T)0.0; };
 
-    Tensor<T> tensor(vec, (size_t)size, shape, shape_size);
+    Tensor<T> tensor(vec, size, shape, shape_size);
     return tensor;
   };
 
   template <typename T> Tensor<T> zeros_like(Tensor<T>& tensor) {
-    int shape = tensor.matrix_shape();
+    int* shape = tensor.matrix_shape();
     size_t shape_size = tensor.shape_size();
 
-    int size = 1;
-    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    size_t size = 1;
+    for (size_t i = 0; i < shape_size; i++) { size *= shape[i]; };
 
     T new_vec[size];
-    for (int i = 0; i < size; i++) { new_vec[i] = (T)0.0; };
+    for (size_t i = 0; i < size; i++) { new_vec[i] = (T)0.0; };
 
-    Tensor<T> new_tensor(new_vec, (size_t)size, shape, shape_size);
+    Tensor<T> new_tensor(new_vec, size, shape, shape_size);
     return new_tensor;
   };
 
   template <typename T> Tensor<T> ones(int shape[], size_t shape_size) {
-    int size = 1;
-    for (int i = 0; i < shape.size(); i++) { size *= shape[i]; };
+    size_t size = 1;
+    for (size_t i = 0; i < shape_size; i++) { size *= shape[i]; };
 
     T vec[size];
-    for (int i = 0; i < size; i++) { vec[i] = (T)1.0; };
+    for (size_t i = 0; i < size; i++) { vec[i] = (T)1.0; };
     
-    Tensor<T> tensor(vec, (size_t)size, shape, shape_size);
+    Tensor<T> tensor(vec, size, shape, shape_size);
     return tensor;
   };
 
   template <typename T> Tensor<T> ones_like(Tensor<T>& tensor) {
-    int shape = tensor.matrix_shape();
+    int* shape = tensor.matrix_shape();
     size_t shape_size = tensor.shape_size();
 
-    int size = 1;
-    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    size_t size = 1;
+    for (size_t i = 0; i < shape_size; i++) { size *= shape[i]; };
     
     T new_vec[size];
-    for (int i = 0; i < size; i++) { new_vec[i] = (T)1.0; };
+    for (size_t i = 0; i < size; i++) { new_vec[i] = (T)1.0; };
 
-    Tensor<T> new_tensor(new_vec, (size_t)size, shape, shape_size);
+    Tensor<T> new_tensor(new_vec, size, shape, shape_size);
     return new_tensor;
   };
 
   Tensor<int> randomInt(int shape[], size_t shape_size) {
-    int size = 1;
-    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    size_t size = 1;
+    for (size_t i = 0; i < shape_size; i++) { size *= shape[i]; };
     
     int vec[size];
-    for (int i = 0; i < size; i++) { vec[i] = (int)(rand() % 100); };
+    for (size_t i = 0; i < size; i++) { vec[i] = (rand() % 100); };
 
-    Tensor<int> tensor(vec, (size_t)size, shape, shape_size);
+    Tensor<int> tensor(vec, size, shape, shape_size);
     return tensor;
   };
 
   template <typename T> Tensor<T> randomDecimal(int shape[], size_t shape_size) {
-    int size = 1;
-    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    size_t size = 1;
+    for (size_t i = 0; i < shape_size; i++) { size *= shape[i]; };
     
     T vec[size];
-    for (int i = 0; i < size; i++) { vec[i] = (T)(rand() % 100) / (T)100.0; };
+    for (size_t i = 0; i < size; i++) { vec[i] = (T)(rand() % 100) / (T)100.0; };
 
-    Tensor<T> tensor(vec, (size_t)size, shape, shape_size);
+    Tensor<T> tensor(vec, size, shape, shape_size);
     return tensor;
   };
 
   Tensor<bool> boolean(bool state, int shape[], size_t shape_size) {
-    int size = 1;
-    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    size_t size = 1;
+    for (size_t i = 0; i < shape_size; i++) { size *= shape[i]; };
     
     bool vec[size];
-    for (int i = 0; i < size; i++) { vec[i] = state; };
+    for (size_t i = 0; i < size; i++) { vec[i] = state; };
 
-    Tensor<bool> tensor(vec, (size_t)size, shape, shape_size);
+    Tensor<bool> tensor(vec, size, shape, shape_size);
     return tensor;
   };
 
@@ -104,35 +100,36 @@ namespace NNLib {
     if (last2nd != last1st) { 
       throw std::invalid_argument("The inside matrix is not a square"); 
     };
-    int size = 1;
-    for (int i = 0; i < (int)shape_size; i++) { size *= shape[i]; };
+    size_t size = 1;
+    for (size_t i = 0; i < shape_size; i++) { size *= shape[i]; };
     
     T vec[size];
-    for (int i = 0; i < size; i++) { vec[i] = (T)0.0; };
+    for (size_t i = 0; i < size; i++) { vec[i] = (T)0.0; };
 
-    for (int i = 0; i < size / (last2nd * last1st); i++) {
+    for (size_t i = 0; i < size / (last2nd * last1st); i++) {
       for (int j = 0; j < last1st; j++) {
-        int idx = j + j * last1st + i * last2nd * last1st;
+        size_t idx = j + j * last1st + i * last2nd * last1st;
         vec[idx] = (T)1.0;
       };
     };
 
-    Tensor<T> tensor(vec, (size_t)size, shape, shape_size);
+    Tensor<T> tensor(vec, size, shape, shape_size);
     return tensor;
   };
 
 
   template <typename T> Tensor<T> slice(Tensor<T>& tensor, int shape[][2], size_t shape_size) {
-
+    
+    T data = tensor.data;
     int shape = tensor.matrix_shape();
-    int new_shape[(int)shape_size];
+    int new_shape[shape_size];
     if (shape_size % 2 != 0) { throw std::invalid_argument("The shape size cannot be an odd number."); };
     if (shape_size / 2 != tensor.shape_size()) { throw std::invalid_argument("The dimension of the slice must match the dimension of the target tensor."); };
 
     // pos contains all the starting indices and keeps tracking if there is any dimension is 
 
     int new_size = 1;
-    for (int i = 0; i < (int)shape_size / 2; i++) {
+    for (size_t i = 0; i < shape_size / 2; i++) {
       int s = shape[i][0];
       int e = shape[i][1];
       if (e < s) { throw std::invalid_argument("Begining or end index is set wrong."); };
@@ -146,17 +143,19 @@ namespace NNLib {
 
     bool end = false;
     int count = 0;
-    int last_dim = (int)shape_size / 2 - 1;
+    int last_dim = shape_size / 2 - 1;
     int chunk = shape[last_dim][0] * shape[last_dim][1];
-    // int idx = pos.back();
+    // size_t idx = pos.back();
     while (end != true) {
       // Going through the list in backwards to calculate the index.
-      for (int i = new_size - 2; i > -1; i--) {
+      for (size_t i = new_size - 2; i > -1; i--) {
         
         // Get position and push the items into the subVec
-        for (int k = (int)tensor.shape_size() - 2; k > -1; k--) {
+        for (int k = tensor.shape_size() - 2; k > -1; k--) {
           idx += pos[k] * chunk;
-          newMat[count] = tensor[idx];
+
+          
+          newMat[count] = data[idx];
           count++;
           pos[i]++;
         };
@@ -194,24 +193,25 @@ namespace NNLib {
   };
 
 
-  template <typename T> Tensor<std::vector<T>> concat(Tensor<std::vector<T>>& matrix1, std::vector<T>& matrix2, int& dim) {
-    std::vector<int> shape1 = matrix1.shape();
-    std::vector<int> shape2 = matrix2.shape();
-    if (dim < 0 || dim > shape1.size() - 1) { throw std::invalid_argument("Dimension is out of range."); };
+  template <typename T> Tensor<T> concat(Tensor<T>& tensor1, Tensor<T>& tensor2, int& dim) {
+    int* shape1 = tensor1.matrix_shape();
+    int* shape2 = tensor2.matrix_shape();
+    if (dim < 0 || dim > tensor1.shape_size() - 1) { throw std::invalid_argument("Dimension is out of range."); };
 
-    std::vector<T> data1 = matrix1.data;
-    std::vector<T> data2 = matrix2.data;
+    T data1 = tensor1.data;
+    T data2 = tensor2.data;
 
-    int size = 1;
-    std::vector<int> newShape(shape1, 1);
+    size_t size = 1;
+    int new_shape_size = tensor1.shape_size();
+    int new_shape[new_shape_size];
 
-    for (int i = 0; i < shape1; i++) {
+    for (size_t i = 0; i < tensor1.shape_size(); i++) {
       if (i != dim) {
         if (shape1[i] != shape2[i]) { throw std::invalid_argument("The dimensions of two matrices are not compitable."); };
-        newShape[i] = shape1[i];
+        new_shape[i] = shape1[i];
       } 
       else {
-        newShape[i] = shape1[i] + shape2[i];
+        new_shape[i] = shape1[i] + shape2[i];
       };
       size *= shape1[i];
     };
@@ -221,39 +221,38 @@ namespace NNLib {
     // Then, the process repeats until the loop goes over the entire matrices.
     int chunk1 = 1;
     int chunk2 = 1;
-    for (int i = dim; i < shape1.size(); i++) {
+    for (size_t i = dim; i < tensor1.shape_size(); i++) {
       chunk1 *= shape1[i];
       chunk2 *= shape2[i];
     };
 
-    int newSize = 1;
-    for (int i = 0; i < newShape.size(); i++) { newSize *= newShape[i]; };
+    int new_size = 1;
+    for (size_t i = 0; i < new_shape_size; i++) { new_size *= new_shape[i]; };
 
-    std::vector<T> newMat;
-    newMat.reserve(newSize);
+    T new_vec[new_size];
 
-    int newMatIdx = 0;
+    int new_vec_idx = 0;
     // The outer loop goes through n chunks. The inner loop runs within the chunk to fill the new matrix.
-    for (int i = 0; i < size / chunk1; i++) {
+    for (size_t i = 0; i < size / chunk1; i++) {
       for (int j = 0; j < chunk1; j++) {
-        int idx = j + i * chunk1;
-        newMat[newMatIdx] = data1[idx];
-        newMatIdx++;
+        size_t idx = j + i * chunk1;
+        new_vec[new_vec_idx] = data1[idx];
+        new_vec_idx++;
       };
       for (int k = 0; k < chunk2; k++) {
-        int idx = k + i * chunk2;
-        newMat[newMatIdx] = data2[idx];
-        newMatIdx++;
+        size_t idx = k + i * chunk2;
+        new_vec[new_vec_idx] = data2[idx];
+        new_vec_idx++;
       };
     };
-    Tensor<std::vector<T>> mat(newMat, newShape);
-    return mat;
+    Tensor<T> new_tensor(new_vec, new_size, new_shape, new_shape_size);
+    return new_tensor;
   };
 
 
-  template <typename T> Tensor<std::vector<T>> transpose(Tensor<std::vector<T>>& matrix, int idxA, int idxB) { 
-    std::vector<int> shape = matrix.shape();
-    std::vector<T> data = matrix.data;
+  template <typename T> Tensor<T> transpose(Tensor<T>& matrix, size_t idxA, size_t idxB) { 
+    int* shape = matrix.matrix_shape();
+    T data = matrix.data;
     
     if (idxA < 0 || idxA > shape.size() - 1 || idxB < 0 || idxB > shape.size() - 1) {
       throw std::invalid_argument("Index is out of range.");
@@ -268,226 +267,229 @@ namespace NNLib {
     // The inner loop calculates how many loops we need to go through after the two transpose indices
     // 2 x 2 x 5 x 3 x 2 x 2  if we transpose 5 and 3 , the outer loop is 4 = 2 x 2, and the inner loop is 4 = 2 x 2
     int outerLoop = 1;
-    int innerLoop = 1;
-    for (int i = 0; i < idxA; i ++) { outerLoop *= shape[i]; };
-    for (int i = idxB + 1; i < shape.size(); i++) { innerLoop *= shape[i]; };
+    size_t innerLoop = 1;
+    for (size_t i = 0; i < idxA; i ++) { outerLoop *= shape[i]; };
+    for (size_t i = idxB + 1; i < matrix.shape_size(); i++) { innerLoop *= shape[i]; };
     
     // The outerChunk is 5 x 3 x 2 x 2 if we use the above example.
     // The innerChunk is 2 x 2, which is same to the innerLoop.
     int outerChunk = 1;
-    int innerChunk = innerLoop;
-    for (int i = idxA; i < shape.size(); i++) {
+    size_t innerChunk = innerLoop;
+    for (size_t i = idxA; i < shape.size(); i++) {
       outerChunk *= shape[i];
     };
 
-    std::vector<T> newMatrix;
-    newMatrix.reserve(outerLoop * outerChunk);
+    T new_vec[outerLoop * outerChunk];
 
     int count = 0;
-    for (int i = 0; i < outerLoop; i++) {
+    for (size_t i = 0; i < outerLoop; i++) {
       for (int j = 0; j < shape[idxA]; j++) {
         for (int k = 0; k < shape[idxB]; k++) {
           int h = k + j * shape[idxB] + i * outerChunk;
           for (int w = 0; w < innerLoop; w++) {
-            int idx = w + h * innerChunk;
-            newMatrix[count] = data[idx];
+            size_t idx = w + h * innerChunk;
+            new_vec[count] = data[idx];
             count++;
           };
         };
       };
     };
 
-    Tensor<std::vector<T>> mat(newMatrix, shape);
-    return mat;
+    Tensor<T> new_tensor(new_vec, matrix.matrix_shape(), shape, matrix.shape_size());
+    return new_tensor;
   };
 
 
-  template <typename T> Tensor<std::vector<T>> permute(Tensor<std::vector<T>>& matrix, int& idxA, int& idxB) {
-    std::vector<int> shape = matrix.shape();
-    Tensor<std::vector<T>> mat(matrix, shape);
-    return mat;
+  template <typename T> Tensor<T> permute(Tensor<T>& matrix, int& idxA, int& idxB) {
+    Tensor<T> tensor();
+    return tensor;
   };
 
 
   // Implement a function for arithmatic calculation
 
-  template <typename T> void perform_operation(T (*opera)(T, T), std::vector<T>& newVector, Tensor<std::vector<T>>& m1, Tensor<std::vector<T>>& m2, int dimPrt, int& idx, int s1, int e1, int s2, int e2) {
-    std::vector<int> shape1 = m1.shape();
-    std::vector<int> shape2 = m2.shape();
+  template <typename T> void perform_operation(T (*opera)(T, T), std::vector<T>& newVector, Tensor<T>& m1, Tensor<T>& m2, int dim_prt, int& idx, int s1, int e1, int s2, int e2) {
+    int* shape1 = m1.matrix_shape();
+    int* shape2 = m2.matrix_shape();
 
-    if (dimPrt == shape1.size() - 1) {
-      if (shape1[dimPrt] == shape2[dimPrt]) {
-        for (i = 0; i < e1 - s1 + 1; i ++) {
+    if (dim_prt == shape1.size() - 1) {
+      if (shape1[dim_prt] == shape2[dim_prt]) {
+        for (size_t i = 0; i < e1 - s1 + 1; i++) {
           newVector[idx] = opera(m1.data[i + s1], m2.data[i + s2]);  // Implement a function for arithmatic calculation
-          idx ++;
+          idx++;
         };
-      };
-      else {
-        for (int i = s1; i < e1; i ++) {
-          for (int j = s2; j < e2; j ++) {
+      } else {
+        for (size_t i = s1; i < e1; i++) {
+          for (size_t j = s2; j < e2; j++) {
             newVector[idx] = opera(m1.data[i + s1], m2.data[i + s2]);  // Implement a function for arithmatic calculation
-            idx ++;
+            idx++;
           };
         };
       };
-    }
-    else {
-      int chunk1 = (e1 - s1 + 1) / shape1[dimPrt];
-      int chunk2 = (e2 - s2 + 1) / shape2[dimPrt];
-      int nextDimPrt = dimPrt + 1;
-      if (shape1[dimPrt] == shape2[dimPrt]) {
-        for (int i = 0; i < shape1[dimPrt]; i ++) {
+    } else {
+      int chunk1 = (e1 - s1 + 1) / shape1[dim_prt];
+      int chunk2 = (e2 - s2 + 1) / shape2[dim_prt];
+      int next_dim_prt = dim_prt + 1;
+      if (shape1[dim_prt] == shape2[dim_prt]) {
+        for (size_t i = 0; i < shape1[dim_prt]; i ++) {
           int newS1 = s1 + i * chunk1;
           int newE1 = e1 + i * chunk1;
           int newS2 = s2 + i * chunk2;
           int newE2 = e2 + i * chunk2;
-          perform_operation<T>(opera, newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+          perform_operation<T>(opera, newVector, m1, m2, next_dim_prt, idx, newS1, newE1, newS2, newE2);
         };
       }
       else {
-        for (int i = 0; i < shape1[dimPrt], i ++) {
+        for (size_t i = 0; i < shape1[dim_prt], i ++) {
           int newS1 = s1 + i * chunk1;
           int newE1 = e1 + i * chunk1;
-          for (int j = 0; j < shape2[dimPrt], j ++) {
+          for (size_t j = 0; j < shape2[dim_prt], j ++) {
             int newS2 = s2 + i * chunk2;
             int newE2 = e2 + i * chunk2;
-            perform_operation<T>(opera, newVector, m1, m2, nextDimPrt, idx, newS1, newE1, newS2, newE2);
+            perform_operation<T>(opera, newVector, m1, m2, next_dim_prt, idx, newS1, newE1, newS2, newE2);
           };
         };
       };
     };
   };
 
-  void update_shape_n_size(std::vector<int>& m1Shape, std::vector<int>& m2Shape, std::vector<int>& newShape, int& newSize) {
-    if (m1Shape.size() != m2Shape.size()) { 
+  void update_shape_n_size(int m1_shape[], size_t m1_shape_size, int m2_shape[], size_t m2_shape_size, int new_shape[], size_t& new_size) {
+    if (m1_shape_size != m2_shape_size) { 
       throw std::invalid_argument("The number of dimension is different between the two matrices."); 
     };
-    if (m1Shape.size() < 1) {
+    if (m1_shape_size < 1) {
       throw std::invalid_argument("The matrix cannot be empty."); 
     };
     
-    for (int i = 0; i < m1Shape.size(); i++) {
-      if (m1Shape[i] != m2Shape[i]) {
-        if (m1Shape[i] != 1 && m2Shape[i] != 1) {
+    for (size_t i = 0; i < m1_shape_size; i++) {
+      if (m1_shape[i] != m2_shape[i]) {
+        if (m1_shape[i] != 1 && m2_shape[i] != 1) {
           throw std::invalid_argument("The dimensions are incompatible.");
         };
       };
 
-      int n = std::max(m1Shape[i], m2Shape[i]);
-      newShape[i] = n;
-      newSize *= n;
+      int n = std::max(m1_shape[i], m2_shape[i]);
+      new_shape[i] = n;
+      new_size *= n;
     };
   };
 
 
-  template <typename T> Tensor<std::vector<T>> mat_add(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
-    std::vector<int> m1Shape = mat1.shape();
-    std::vector<int> m2Shape = mat2.shape();
-    std::vector<int> newShape(m1Shape.size(), 1);
-    int newSize = 1;
-    update_shape_n_size(m1Shape, m2Shape, newShape, newSize);
+  template <typename T> Tensor<T> mat_add(Tensor<T>& mat1, Tensor<T>& mat2) {
+    int* m1_shape = mat1.matrix_shape();
+    int* m2_shape = mat2.matrix_shape();
+    int new_shape[mat1.shape_size()];
+    size_t new_size = 1;
+    update_shape_n_size(m1_shape, mat1.shape_size(), m2_shape, mat2.shape_size(), new_shape, new_size);
 
-    std::vector<T> data1 = mat1.data;
-    std::vector<T> data2 = mat2.data;
-    std::vector<T> newVector;
-    newVector.reserve(newSize);
+    T data1 = mat1.data;
+    T data2 = mat2.data;
+    T new_vec[new_size];
 
-    perform_operation<T>([](T a, T b){ return a + b }, newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
-    Tensor<std::vector<T>> mat(newVector, newShape);
-    return mat;
+    perform_operation<T>([](T a, T b){ return a + b }, new_vec, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    Tensor<T> new_tensor(new_vec, new_size, new_shape, mat1.shape_size());
+    return new_tensor;
   };
 
 
-  template <typename T> Tensor<std::vector<T>> mat_sub(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
-    std::vector<int> m1Shape = mat1.shape();
-    std::vector<int> m2Shape = mat2.shape();
-    std::vector<int> newShape(m1Shape.size(), 1);
-    int newSize = 1;
-    update_shape_n_size(m1Shape, m2Shape, newShape, newSize);
+  template <typename T> Tensor<T> mat_sub(Tensor<T>& mat1, Tensor<T>& mat2) {
+    int* m1_shape = mat1.matrix_shape();
+    int* m2_shape = mat2.matrix_shape();
+    int new_shape[mat1.shape_size()];
+    size_t new_size = 1;
+    update_shape_n_size(m1_shape, mat1.shape_size(), m2_shape, mat2.shape_size(), new_shape, new_size);
 
-    std::vector<T> data1 = mat1.data;
-    std::vector<T> data2 = mat2.data;
-    std::vector<T> newVector;
-    newVector.reserve(newSize);
+    T data1 = mat1.data;
+    T data2 = mat2.data;
+    T new_vec[new_size];
 
-    perform_operation<T>([](T a, T b){ return a - b }, newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
-    Tensor<std::vector<T>> mat(newVector, newShape);
-    return mat;
+    perform_operation<T>([](T a, T b){ return a - b }, new_vec, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    Tensor<T> new_tensor(new_vec, new_size, new_shape, mat1.shape_size());
+    return new_tensor;
   };
 
 
-  template <typename T> Tensor<std::vector<T>> mat_mul(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
-    std::vector<int> m1Shape = mat1.shape();
-    std::vector<int> m2Shape = mat2.shape();
-    std::vector<int> newShape(m1Shape.size(), 1);
-    int newSize = 1;
-    update_shape_n_size(m1Shape, m2Shape, newShape, newSize);
+  template <typename T> Tensor<T> mat_mul(Tensor<T>& mat1, Tensor<T>& mat2) {
+    int* m1_shape = mat1.matrix_shape();
+    int* m2_shape = mat2.matrix_shape();
+    int new_shape[mat1.shape_size()];
+    size_t new_size = 1;
+    update_shape_n_size(m1_shape, mat1.shape_size(), m2_shape, mat2.shape_size(), new_shape, new_size);
 
-    std::vector<T> data1 = mat1.data;
-    std::vector<T> data2 = mat2.data;
-    std::vector<T> newVector;
-    newVector.reserve(newSize);
+    T data1 = mat1.data;
+    T data2 = mat2.data;
+    T new_vec[new_size];
 
-    perform_operation<T>([](T a, T b){ return a * b }, newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
-    Tensor<std::vector<T>> mat(newVector, newShape);
-    return mat;
+    perform_operation<T>([](T a, T b){ return a * b }, new_vec, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    Tensor<T> new_tensor(new_vec, new_size, new_shape, mat1.shape_size());
+    return new_tensor;
   };
 
 
-  template <typename T> Tensor<std::vector<T>> mat_div(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
-    std::vector<int> m1Shape = mat1.shape();
-    std::vector<int> m2Shape = mat2.shape();
-    std::vector<int> newShape(m1Shape.size(), 1);
-    int newSize = 1;
-    update_shape_n_size(m1Shape, m2Shape, newShape, newSize);
+  template <typename T> Tensor<T> mat_div(Tensor<T>& mat1, Tensor<T>& mat2) {
+    int* m1_shape = mat1.matrix_shape();
+    int* m2_shape = mat2.matrix_shape();
+    int new_shape[mat1.shape_size()];
+    size_t new_size = 1;
+    update_shape_n_size(m1_shape, mat1.shape_size(), m2_shape, mat2.shape_size(), new_shape, new_size);
 
-    std::vector<T> data1 = mat1.data;
-    std::vector<T> data2 = mat2.data;
-    std::vector<T> newVector;
-    newVector.reserve(newSize);
+    T data1 = mat1.data;
+    T data2 = mat2.data;
+    T new_vec[new_size];
 
-    perform_operation<T>([](T a, T b){ return a / b }, newVector, mat1, mat2, 0, 0, 0, size1, 0, size2);
-    Tensor<std::vector<T>> mat(newVector, newShape);
-    return mat;
+    perform_operation<T>([](T a, T b){ return a / b }, new_vec, mat1, mat2, 0, 0, 0, size1, 0, size2);
+    Tensor<T> new_tensor(new_vec, new_size, new_shape, mat1.shape_size());
+    return new_tensor;
   };
 
 
-  template <typename T> Tensor<std::vector<T>> mat_dot(Tensor<std::vector<T>>& mat1, Tensor<std::vector<T>>& mat2) {
-    
-    Tensor<std::vector<T>> newMat(mat1, mat1.shape());
-    return newMat;
+  template <typename T> Tensor<T> mat_dot(Tensor<T>& mat1, Tensor<T>& mat2) {
+    Tensor<T> tensor();
+    return tensor;
   };
 
   
-  template <typename T> Tensor<std::vector<T>> Conv2d(Tensor<std::vector<T>>& mat, int in_channels, int out_channels, int kernel, int padding, int stride) {
-    Tensor<std::vector<T>> newMat(mat, mat.shape());
-    return newMat;
+  template <typename T> Tensor<T> Conv2d(Tensor<T>& tensor, size_t in_channels, int out_channels, int kernel, int padding, int stride) {
+    
+    Tensor<T> new_tensor();
+    return new_tensor;
   };
 
-  template <typename T> Tensor<std::vector<T>> BatchNorm2D(Tensor<std::vector<T>>& mat) {
+  template <typename T> Tensor<T> BatchNorm2D(Tensor<T>& tensor) {
     /*
     num_features, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True, device=None, dtype=None
     
-    num_features (int) – CC from an expected input of size (N, C, H, W)(N,C,H,W)
+    num_features  – CC from an expected input of size (N, C, H, W)(N,C,H,W)
     eps (float) – a value added to the denominator for numerical stability. Default: 1e-5
     momentum (float) – the value used for the running_mean and running_var computation. Can be set to None for cumulative moving average (i.e. simple average). Default: 0.1
     affine (bool) – a boolean value that when set to True, this module has learnable affine parameters. Default: True
     track_running_stats (bool) – a boolean value that when set to True, this module tracks the running mean and variance, and when set to False, this module does not track such statistics, and initializes statistics buffers running_mean and running_var as None. When these buffers are None, this module always uses batch statistics. in both training and eval modes. Default: True
     */
-
+    Tensor<T> new_tensor();
+    return new_tensor;
   };
 
-  template <typename T> void ReLU(Tensor<std::vector<T>>& mat) {
+
+  template <typename T> void ReLU(Tensor<T>& tensor) {
     T zero = 0.0;
     for (auto& item : mat.data) { item = std::max(zero, item); };
   };
 
-  template <typename T> void Sigmoid(Tensor<std::vector<T>>& mat) {
+
+  template <typename T> void Sigmoid(Tensor<T>& mat) {
     T one = 1.0;
     for (auto& item : mat.data) { item = one / (one + std::exp(-item)); };
   };
+
+
+  template <typename T> Tensor<T> normalize_imgs(Tensor<T>& mat, std::vector<int>& shift_values) {
+    Tensor<T> tensor();
+    return tensor;
+  };
   
 };
+
+
 
 // Adam  https://pytorch.org/docs/stable/generated/torch.optim.Adam.html
 // WightInit  https://machinelearningmastery.com/weight-initialization-for-deep-learning-neural-networks/
