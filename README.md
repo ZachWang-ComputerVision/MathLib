@@ -1,4 +1,4 @@
-# NNLib
+# Neural Block
 
 This project is programmed solely with C++. The objective is to build a package similar to OpenMMLab:
 https://github.com/open-mmlab
