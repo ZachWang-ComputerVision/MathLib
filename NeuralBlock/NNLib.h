@@ -7,13 +7,6 @@
 
 namespace NNLib {
 
-
-    // template <class T> struct DataContainer {
-    //   std::initializer_list<T> data;
-    //   DataContainer(std::initializer_list<T> init) : data(init) {};
-    //   ~DataContainer() {};
-    // };
-
     template <class T> class Tensor {
     public:
         T* data;
@@ -65,9 +58,9 @@ namespace NNLib {
 
     public:
         Tensor() { realloc(1); };
-        Tensor(size_t n) { realloc(n); };
-        Tensor(T item, size_t n) { realloc(item, n); };
-        Tensor(T matrix[], size_t m_Size, int mat_shape[], size_t s_Size) {
+        Tensor(size_t& n) { realloc(n); };
+        Tensor(T& item, size_t& n) { realloc(item, n); };
+        Tensor(T& matrix[], size_t& m_Size, int& mat_shape[], size_t& s_Size) {
             size_t matrix_Size = 1;
             size_t shape_Size = 0;
             for (int i = 0; i < (int)s_Size; i++) {

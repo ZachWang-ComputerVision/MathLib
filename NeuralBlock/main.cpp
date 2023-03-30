@@ -3,13 +3,16 @@
 #include <list>
 #include <cstdlib>
 #include <omp.h>
+#include <cstdio>
 
 #include <fstream>
 #include <sstream>
 // #include <tbb/detail/
 
 #include "json.h"
-// #include "NNLib.h"
+#include "read_img.h"
+#include "test.h"
+#include "NNLib.h"
 // #include "test.cuh"
 
 
@@ -76,7 +79,28 @@
 
 
 
+
 int main() {
+    std::vector<unsigned char> im_data;
+    std::string filename("test.jpg");
+    Image im(filename, im_data);
+    
+    size_t image_size = im.size;
+    std::cout << "image size: " << image_size << std::endl;
+    
+    const size_t RGBA = 4;
+
+    int x = 3;
+    int y = 4;
+    size_t index = RGBA * (y * (int)(im.w) + x);
+    std::cout << "RGBA pixel @ (x=3, y=4): "
+        << static_cast<int>(im_data[index + 0]) << " "
+        << static_cast<int>(im_data[index + 1]) << " "
+        << static_cast<int>(im_data[index + 2]) << '\n';
+
+    std::cout << "\n" << std::endl;
+    std::cout << "---------------------------------------------" << std::endl;
+
     /* Test JSON type container */
     std::cout << "Test JSON type container" << std::endl;
     NNLib::JSON v1;
@@ -135,40 +159,21 @@ int main() {
     NNLib::JSON p = q.parse();
     std::cout << p.str() << std::endl;
 
-    // read a json file
-    // ifstream fin("./test.json");
-    // stringstream ss;
-    // const std::string & f_content = ss.str();
-    // NNLib::Parser q;
-    // q.load(str_parser);
-    // NNLib::JSON p = q.parse();
-    // std::cout << p.str() << std::endl;
+    std::cout << "\n" << std::endl;
+    std::cout << "---------------------------------------------" << std::endl;
 
-
-
-
-    /* Test Image and Video read */
-
-
-
-    // 
-    // const int tre = 5;
-    // int trew[tre];
-    // trew[0] = 1;
-    // trew[1] = 1;
-    // trew[2] = 1;
-    // trew[3] = 1;
-    // std::cout << "out: " << trew[0] << trew[1] << trew[2] << std::endl;
-
-    // int za[2] = {2,3};
-    // size_t zs = 2;
-
-    // int a[6] = {1,2,3,4,5,6};
-    // int b[6] = {1,2,3,4,5,6};
-    // size_t s = 6;
-
-    // NNLib::Tensor<int> zero = NNLib::Tensor<int>(a, s, za, zs);
-    // NNLib::Tensor<int> one = NNLib::Tensor<int>(a, s, za, zs);
+    
+    int a[6] = {1,2,3,4,5,6};
+    int b[6] = {1,2,3,4,5,6};
+    size_t ams = 6;
+    size_t bms = 6;
+    int as[2] = { 2,3 };
+    int bs[2] = { 2,3 };
+    size_t ast = 2;
+    size_t bst = 2;
+    
+    NNLib::Tensor<int> arr1 = NNLib::Tensor<int>(a, ams, as, ast);
+    //NNLib::Tensor<int> arr2 = NNLib::Tensor<int>(b, bms, bs, bst);
 
     // NNLib::Tensor<int> acon = AConcat<int>(zero, one, 0);
     // int* dataa = acon.get_data();
@@ -240,13 +245,95 @@ int main() {
     // NNLib::Tensor<float> transpose = NNLib::Transpose<float>(rand_f, 1, 2);
     // std::cout << "transpose matrix size: " << transpose.matrix_size() << std::endl;
 
-    if (__cplusplus == 201703L) { std::cout << "C++17"; }
-    else if (__cplusplus == 201402L) { std::cout << "C++14"; }
-    else if (__cplusplus == 201103L) { std::cout << "C++11"; }
-    else if (__cplusplus == 199711L) { std::cout << "C++98"; }
-    else { std::cout << "pre-standard C++"; };
 
+    return 0;
+};
+
+
+/*
+#include <iostream>
+#include <cuda_runtime.h>
+
+int main()
+{
+    const int N = 10;
+    float* h_data = new float[N]; // Allocate host memory
+    for (int i = 0; i < N; i++)
+    {
+        h_data[i] = static_cast<float>(i);
+    }
+
+    float* d_data; // Pointer to device memory
+    cudaMalloc(&d_data, N * sizeof(float)); // Allocate device memory
+    cudaMemcpy(d_data, h_data, N * sizeof(float), cudaMemcpyHostToDevice); // Copy host data to device
+
+    // Use the GPU to process the data here...
+
+    cudaMemcpy(h_data, d_data, N * sizeof(float), cudaMemcpyDeviceToHost); // Copy device data to host
+    cudaFree(d_data); // Free device memory
+
+    for (int i = 0; i < N; i++)
+    {
+        std::cout << h_data[i] << " ";
+    }
+    std::cout << std::endl;
+
+    delete[] h_data; // Free host memory
 
     return 0;
 }
+
+*/
+
+
+
+
+/*
+#include <iostream>
+#include <cuda_runtime.h>
+
+__global__ void myKernel(float* data, int n)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < n)
+    {
+        data[i] *= 2.0f;
+    }
+}
+
+extern "C" void callMyKernel(float* data, int n)
+{
+    myKernel<<<1, n>>>(data, n);
+}
+
+int main()
+{
+    const int N = 10;
+    float* h_data = new float[N]; // Allocate host memory
+    for (int i = 0; i < N; i++)
+    {
+        h_data[i] = static_cast<float>(i);
+    }
+
+    float* d_data; // Pointer to device memory
+    cudaMalloc(&d_data, N * sizeof(float)); // Allocate device memory
+    cudaMemcpy(d_data, h_data, N * sizeof(float), cudaMemcpyHostToDevice); // Copy host data to device
+
+    callMyKernel(d_data, N); // Call CUDA kernel from host code
+
+    cudaMemcpy(h_data, d_data, N * sizeof(float), cudaMemcpyDeviceToHost); // Copy device data to host
+    cudaFree(d_data); // Free device memory
+
+    for (int i = 0; i < N; i++)
+    {
+        std::cout << h_data[i] << " ";
+    }
+    std::cout << std::endl;
+
+    delete[] h_data; // Free host memory
+
+    return 0;
+}
+
+*/
 

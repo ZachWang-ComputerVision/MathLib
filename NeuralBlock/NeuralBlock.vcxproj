@@ -148,6 +148,13 @@
   <ItemGroup>
     <ClInclude Include="json.h" />
     <ClInclude Include="NNLib.h" />
+    <ClInclude Include="read_img.h" />
+    <ClInclude Include="stb_image_write.h" />
+    <ClInclude Include="stb_img.h" />
+    <ClInclude Include="test.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="test.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
